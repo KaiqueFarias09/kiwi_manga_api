@@ -10,5 +10,5 @@ export class SignupDto {
 
   @IsString()
   @IsNotEmpty()
-  name: string;
+  nickname: string;
 }
