@@ -34,7 +34,7 @@ export class AuthService implements IAuthService {
       const user = await this.prisma.user.create({
         data: {
           id: id,
-          nickname: signupDto.name,
+          nickname: signupDto.nickname,
           email: signupDto.email,
           password: hash,
           profile_pic: '',
