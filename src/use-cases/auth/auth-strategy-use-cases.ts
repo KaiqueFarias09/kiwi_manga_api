@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { IAuthStrategy } from 'src/core/abstracts';
 
 @Injectable()
-export class AuthStrategyUseCases implements IAuthStrategy {
+export class AuthStrategyUseCases {
   auth: IAuthStrategy;
   constructor(@Inject(IAuthStrategy) authStrategy: IAuthStrategy) {
     this.auth = authStrategy;
