@@ -1,6 +1,6 @@
 export class Chapter {
   name: string;
   url: string;
-  uploadedDate: string;
+  releasedAt: string;
   pages: string[];
 }
