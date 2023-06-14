@@ -7,6 +7,6 @@ export class Manga {
   synopsis: string;
   genres: string[];
   status: string;
-  lastUpdatedDate: string;
+  updatedAt: string;
   chapters: Chapter[];
 }

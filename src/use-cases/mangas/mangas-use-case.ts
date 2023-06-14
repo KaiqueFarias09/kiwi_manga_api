@@ -8,13 +8,13 @@ export class MangasUseCase {
   getManga(url: string): Manga {
     return this.getManga(url);
   }
-  getRandomManga(): Manga {
-    return this.getRandomManga();
+  getRandomManga(): Promise<Manga> {
+    return this.mangasRepository.getRandomManga();
   }
-  getMangas(filter?: string): MangaSimplified {
-    return this.getMangas(filter);
+  getMangas(filter?: string): Promise<MangaSimplified[]> {
+    return this.mangasRepository.getMangas(filter);
   }
-  searchForMangas(keyword: string): MangaList[] {
-    return this.searchForMangas(keyword);
+  searchForMangas(keyword: string): Promise<MangaSimplified[]> {
+    return this.mangasRepository.searchForMangas(keyword);
   }
 }

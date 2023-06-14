@@ -3,5 +3,4 @@ export class MangaSimplified {
   cover: string;
   url: string;
   synopsis: string;
-  genres: string[];
 }
