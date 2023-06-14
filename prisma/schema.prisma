@@ -7,51 +7,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id          String          @id @map("_id")
-  email       String          @unique
-  profile_pic String
-  password    String
-  nickname    String
-  score       BigInt
-  favorites   FavoriteManga[]
-  collections Collection[]
+model NovelCoolManga {
+  id       String    @id @map("_id")
+  name     String
+  url      String    @unique
+  synopsis String
+  genres   String[]
+  cover    String
+  hasCover Boolean   @default(true)
+  chapters Chapter[]
 
-  @@map("users")
+  @@map("novelcool")
 }
 
-model Manga {
-  url           String            @id @map("_id")
-  name          String
-  synopsis      String
-  cover         String
-  genres        String[]
-  collections   MangaCollection[]
-  FavoriteManga FavoriteManga[]
-}
-
-model Collection {
-  name        String            @id @map("_id")
-  description String
-  mangas      MangaCollection[]
-  userId      String
-  user        User              @relation(fields: [userId], references: [id])
-
-  @@map("collections")
-}
-
-model MangaCollection {
-  id           String     @id @map("_id")
-  mangaId      String
-  manga        Manga      @relation(fields: [mangaId], references: [url])
-  collectionId String
-  collection   Collection @relation(fields: [collectionId], references: [name])
-}
-
-model FavoriteManga {
-  id      String @id @map("_id")
-  userId  String
-  user    User   @relation(fields: [userId], references: [id])
-  mangaId String
-  manga   Manga  @relation(fields: [mangaId], references: [url])
+type Chapter {
+  url        String
+  name       String
+  releasedAt String
+  pages      String[]
 }
