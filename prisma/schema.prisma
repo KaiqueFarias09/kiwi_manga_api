@@ -8,14 +8,16 @@ datasource db {
 }
 
 model NovelCoolManga {
-  id       String    @id @map("_id")
-  name     String
-  url      String    @unique
-  synopsis String
-  genres   String[]
-  cover    String
-  hasCover Boolean   @default(true)
-  chapters Chapter[]
+  id        String    @id @map("_id")
+  name      String
+  url       String    @unique
+  synopsis  String
+  genres    String[]
+  cover     String
+  hasCover  Boolean   @default(true)
+  chapters  Chapter[]
+  status    String
+  updatedAt String
 
   @@map("novelcool")
 }
