@@ -26,44 +26,42 @@ export class AuthService implements IAuthService {
   }
 
   async signup(signupDto: SignupDto) {
-    // generate the password hash
-    const hash = await argon.hash(signupDto.password);
-    // save the new user in the db
-    const id = uuid();
-    try {
-      const user = await this.prisma.user.create({
-        data: {
-          id: id,
-          nickname: signupDto.nickname,
-          email: signupDto.email,
-          password: hash,
-          profile_pic: '',
-          score: 0,
-        },
-      });
-
-      return this.signToken({ user_id: user.id, user_email: user.email });
-    } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw new ForbiddenException('Credentials taken');
-        }
-      }
-      throw error;
-    }
+    // // generate the password hash
+    // const hash = await argon.hash(signupDto.password);
+    // // save the new user in the db
+    // const id = uuid();
+    // try {
+    //   const user = await this.prisma.user.create({
+    //     data: {
+    //       id: id,
+    //       nickname: signupDto.nickname,
+    //       email: signupDto.email,
+    //       password: hash,
+    //       profile_pic: '',
+    //       score: 0,
+    //     },
+    //   });
+    //   return this.signToken({ user_id: user.id, user_email: user.email });
+    // } catch (error) {
+    //   if (error instanceof PrismaClientKnownRequestError) {
+    //     if (error.code === 'P2002') {
+    //       throw new ForbiddenException('Credentials taken');
+    //     }
+    //   }
+    //   throw error;
+    // }
   }
 
   async signin(signinDto: SigninDto) {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        email: signinDto.email,
-      },
-    });
-
-    if (!user) throw new ForbiddenException('Credentials incorrect');
-    const pwMatches = await argon.verify(user.password, signinDto.password);
-    if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
-    return this.signToken({ user_id: user.id, user_email: user.email });
+    // const user = await this.prisma.user.findUnique({
+    //   where: {
+    //     email: signinDto.email,
+    //   },
+    // });
+    // if (!user) throw new ForbiddenException('Credentials incorrect');
+    // const pwMatches = await argon.verify(user.password, signinDto.password);
+    // if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
+    // return this.signToken({ user_id: user.id, user_email: user.email });
   }
 
   async signToken({
