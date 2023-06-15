@@ -1,6 +1,7 @@
 import { Chapter } from '../chapters';
 
 export class Manga {
+  id: string;
   name: string;
   url: string;
   cover: string;
