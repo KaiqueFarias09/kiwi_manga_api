@@ -5,10 +5,13 @@ import {
   UsePipes,
   ValidationPipe,
   Headers,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
 import { MangasUseCase } from 'src/use-cases/mangas/mangas-use-case';
 @Controller('mangas')
+@UseGuards(AuthGuard('api-key'))
 export class MangasController {
   constructor(private mangasService: MangasUseCase) {}
 

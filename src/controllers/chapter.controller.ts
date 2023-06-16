@@ -1,7 +1,9 @@
-import { Controller, Get, Headers } from '@nestjs/common';
+import { Controller, Get, Headers, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ChapterUseCase } from 'src/use-cases/chapters';
 
 @Controller()
+@UseGuards(AuthGuard('api-key'))
 export class ChapterController {
   constructor(private chapterService: ChapterUseCase) {}
 

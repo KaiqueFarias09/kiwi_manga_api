@@ -5,12 +5,15 @@ import {
   HttpStatus,
   Inject,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { SigninDto, SignupDto } from '../core/dtos';
 import { AuthServiceUseCases } from 'src/use-cases/auth/auth-service-use-cases';
 import { ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('auth')
+@UseGuards(AuthGuard('api-key'))
 @Controller('auth')
 export class AuthController {
   authService: AuthServiceUseCases;
