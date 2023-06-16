@@ -13,18 +13,21 @@ import {
   MangasUseCaseModule,
 } from './use-cases';
 
+import { ConfigModule } from '@nestjs/config';
+
 @Module({
-  imports: [
-    HealthUseCaseModule,
-    ChapterUseCaseModule,
-    MangasUseCaseModule,
-    AuthUseCasesModule,
-  ],
   controllers: [
     HealthController,
     ChapterController,
     MangasController,
     AuthController,
+  ],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    HealthUseCaseModule,
+    ChapterUseCaseModule,
+    MangasUseCaseModule,
+    AuthUseCasesModule,
   ],
 })
 export class AppModule {}
