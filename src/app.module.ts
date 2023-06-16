@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 
 import {
   AuthController,
@@ -14,6 +14,7 @@ import {
 } from './use-cases';
 
 import { ConfigModule } from '@nestjs/config';
+import { RequestLoggerMiddleware } from './middlewares/request-logger.middleware';
 
 @Module({
   controllers: [
@@ -30,4 +31,8 @@ import { ConfigModule } from '@nestjs/config';
     AuthUseCasesModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestLoggerMiddleware).forRoutes('*');
+  }
+}
