@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { IMangasRepository } from 'src/core/abstracts/mangas/mangas-repostitory.abstract';
 import { MangasServicesService } from './mangas-service.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { ImageComparer } from 'src/utils/image-comparer';
 
 @Module({
   providers: [
@@ -10,6 +11,7 @@ import { PrismaService } from '../prisma/prisma.service';
       useClass: MangasServicesService,
     },
     PrismaService,
+    ImageComparer,
   ],
   exports: [IMangasRepository],
 })

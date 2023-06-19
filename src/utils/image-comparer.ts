@@ -1,16 +1,24 @@
 import { Injectable } from '@nestjs/common';
+import axios from 'axios';
+import axiosRetry from 'axios-retry';
 import * as fs from 'fs';
 import * as resemble from 'resemblejs';
 import * as sharp from 'sharp';
+
+axiosRetry(axios, { retries: 3 });
 
 @Injectable()
 export class ImageComparer {
   async isImageValid(url: string): Promise<boolean> {
     const image = await this.createBufferFromOnlineImage(url);
-    return this.imageHasColors(image) && this.isErrorImage(image);
+    const [doesImageHasColors, isErrorImage] = await Promise.all([
+      this.imageHasColors(image),
+      this.isErrorImage(image),
+    ]);
+    return doesImageHasColors && !isErrorImage;
   }
 
-  private async isErrorImage(onlineImage: Buffer): Promise<boolean> {
+  async isErrorImage(onlineImage: Buffer): Promise<boolean> {
     const localImagesNames: string[] = fs.readdirSync(
       './resources/error_images',
     );
@@ -44,10 +52,11 @@ export class ImageComparer {
     return new Promise((resolve) => {
       resemble(onlineImage)
         .compareTo(imageGrayScale)
-        .ignoreColors()
         .onComplete((data) => {
-          console.log(data);
-          if (data.isSameDimensions && data.rawMisMatchPercentage <= 5) {
+          if (
+            data.isSameDimensions &&
+            Math.round(data.rawMisMatchPercentage) <= 10
+          ) {
             resolve(false);
           } else {
             resolve(true);
@@ -56,10 +65,11 @@ export class ImageComparer {
     });
   }
 
-  private async createBufferFromOnlineImage(imageUrl: string): Promise<Buffer> {
-    const onlineImage = await fetch(imageUrl);
-    const imageBuffer = await onlineImage.arrayBuffer();
-
+  async createBufferFromOnlineImage(imageUrl: string): Promise<Buffer> {
+    const onlineImage = await axios.get(imageUrl, {
+      responseType: 'arraybuffer',
+    });
+    const imageBuffer = onlineImage.data;
     return Buffer.from(imageBuffer);
   }
 }
