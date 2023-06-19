@@ -10,7 +10,7 @@ RUN apk add --no-cache build-base g++ cairo-dev jpeg-dev pango-dev giflib-dev
 
 COPY --chown=node:node package*.json ./
 
-RUN npm ci
+RUN npm install && npm ci
 
 COPY --chown=node:node . .
 
@@ -41,10 +41,6 @@ USER node
 ###################
 
 FROM node:18-alpine AS production
-
-# ENV DATABASE_URL mongodb+srv://kiwimangaapps:7dzS5by6VL2IBk9Y@kiwicluster.06oe3fj.mongodb.net/mangas
-# ENV JWT_SECRET  super-secret
-# ENV ADMIN_TOKEN admin-token
 
 RUN apk add --no-cache cairo jpeg pango giflib
 
