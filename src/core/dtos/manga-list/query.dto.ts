@@ -1,7 +1,15 @@
+import { IsArray, IsOptional } from 'class-validator';
+import { Transform } from 'class-transformer';
+
 export class QueryDto {
-  keyw = '';
-  orby = '';
-  genre = '';
-  language = 'br';
-  page = 1;
+  @IsOptional()
+  @IsArray()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return value.split('&');
+    } else {
+      return value;
+    }
+  })
+  keywords: string[];
 }

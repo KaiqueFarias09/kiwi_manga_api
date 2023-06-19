@@ -1,13 +1,6 @@
-import {
-  Controller,
-  Get,
-  Query,
-  UsePipes,
-  ValidationPipe,
-  Headers,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Param } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { QueryDto } from 'src/core/dtos/manga-list';
 
 import { MangasUseCase } from 'src/use-cases/mangas/mangas-use-case';
 @Controller('mangas')
@@ -16,26 +9,19 @@ export class MangasController {
   constructor(private mangasService: MangasUseCase) {}
 
   @Get()
-  @UsePipes(
-    new ValidationPipe({
-      transform: true,
-    }),
-  )
-  async getMangaList(@Query() { keyw }: { keyw: string }) {
-    if (keyw) {
-      return this.mangasService.searchForMangas(keyw);
-    } else {
-      return this.mangasService.getMangas(keyw);
+  async findMany(@Query() queryDto: QueryDto) {
+    if (queryDto.keywords) {
+      return this.mangasService.getMangas(queryDto.keywords);
     }
   }
 
-  @Get(':id')
-  async getManga(@Headers('url') url: string) {
-    return this.mangasService.getManga(url);
+  @Get('/random')
+  async findRandom() {
+    return this.mangasService.getRandomManga();
   }
 
-  @Get('random')
-  async getRandomManga() {
-    return this.mangasService.getRandomManga();
+  @Get('/:id')
+  async findUnique(@Param('id') id: string) {
+    return this.mangasService.getManga(id);
   }
 }
