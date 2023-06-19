@@ -31,6 +31,7 @@ COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modul
 COPY --chown=node:node . .
 
 RUN npm run build
+COPY --chown=node:node .prisma ./.prisma
 
 RUN npm ci --only=production && npm cache clean --force && npx prisma generate
 USER node
