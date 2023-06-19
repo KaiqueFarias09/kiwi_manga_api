@@ -30,14 +30,9 @@ COPY --chown=node:node package*.json ./
 COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modules
 COPY --chown=node:node . .
 
-# Run Prisma generate command
-RUN npx prisma generate
-
-# Then build the TypeScript code
 RUN npm run build
 
-RUN npm ci --only=production && npm cache clean --force
-
+RUN npm ci --only=production && npm cache clean --force && npx prisma generate
 USER node
 
 ###################
