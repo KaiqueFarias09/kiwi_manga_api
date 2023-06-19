@@ -1,7 +1,7 @@
 import { Chapter } from '../chapters';
 
 export class Manga {
-  id: string;
+  id?: string;
   name: string;
   url: string;
   cover: string;
@@ -10,4 +10,5 @@ export class Manga {
   status: string;
   updatedAt: string;
   chapters: Chapter[];
+  hasCover: boolean;
 }
