@@ -1,20 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { IMangasRepository } from 'src/core/abstracts/mangas/mangas-repostitory.abstract';
-import { Manga, MangaSimplified, MangaList } from 'src/core/entities/mangas';
+import { Manga, MangaSimplified } from 'src/core/entities/mangas';
 
 @Injectable()
 export class MangasUseCase {
   constructor(private readonly mangasRepository: IMangasRepository) {}
-  getManga(url: string): Manga {
-    return this.getManga(url);
+  async getManga(url: string): Promise<Manga> {
+    return this.mangasRepository.getManga(url);
   }
-  getRandomManga(): Promise<Manga> {
+  async getRandomManga(): Promise<Manga> {
     return this.mangasRepository.getRandomManga();
   }
-  getMangas(filter?: string): Promise<MangaSimplified[]> {
-    return this.mangasRepository.getMangas(filter);
-  }
-  searchForMangas(keyword: string): Promise<MangaSimplified[]> {
-    return this.mangasRepository.searchForMangas(keyword);
+  getMangas(keywords: string[]): Promise<MangaSimplified[]> {
+    return this.mangasRepository.getMangas(keywords);
   }
 }
