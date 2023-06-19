@@ -32,7 +32,8 @@ COPY --chown=node:node . .
 
 RUN npm run build
 
-RUN npm ci --only=production && npm cache clean --force && npx prisma generate
+COPY --chown=node:node --from=development /usr/src/app/package-lock.json ./
+RUN npm ci --only=production && npm cache clean --force
 USER node
 
 ###################
