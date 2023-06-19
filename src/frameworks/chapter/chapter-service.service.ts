@@ -38,7 +38,7 @@ export class ChapterFrameworkService implements IChaptersRepository {
     pagesLinks,
     data,
   }: {
-    pagesLinks: Array<any>;
+    pagesLinks: string[];
     data: string[];
   }): Promise<string[]> {
     const pages = await axios

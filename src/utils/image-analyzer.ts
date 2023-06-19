@@ -6,9 +6,8 @@ import * as resemble from 'resemblejs';
 import * as sharp from 'sharp';
 
 axiosRetry(axios, { retries: 3 });
-
 @Injectable()
-export class ImageComparer {
+export class ImageAnalyzer {
   async isImageValid(url: string): Promise<boolean> {
     const image = await this.createBufferFromOnlineImage(url);
     const [doesImageHasColors, isErrorImage] = await Promise.all([
@@ -46,7 +45,7 @@ export class ImageComparer {
     return isMangaCoverEqualToErrorImage;
   }
 
-  private async imageHasColors(onlineImage: Buffer): Promise<boolean> {
+  async imageHasColors(onlineImage: Buffer): Promise<boolean> {
     const imageGrayScale = await sharp(onlineImage).grayscale().toBuffer();
 
     return new Promise((resolve) => {
@@ -65,7 +64,7 @@ export class ImageComparer {
     });
   }
 
-  async createBufferFromOnlineImage(imageUrl: string): Promise<Buffer> {
+  private async createBufferFromOnlineImage(imageUrl: string): Promise<Buffer> {
     const onlineImage = await axios.get(imageUrl, {
       responseType: 'arraybuffer',
     });
