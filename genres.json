@@ -1,0 +1,510 @@
+[
+    {
+        "name": "4-koma",
+        "code": 1
+    },
+    {
+        "name": "4koma",
+        "code": 2
+    },
+    {
+        "name": "Action",
+        "code": 3
+    },
+    {
+        "name": "Adaptation",
+        "code": 4
+    },
+    {
+        "name": "Adventure",
+        "code": 5
+    },
+    {
+        "name": "Aliens",
+        "code": 6
+    },
+    {
+        "name": "Animals",
+        "code": 7
+    },
+    {
+        "name": "Anthology",
+        "code": 8
+    },
+    {
+        "name": "Artes Marciais",
+        "code": 9
+    },
+    {
+        "name": "Aventura",
+        "code": 10
+    },
+    {
+        "name": "Award Winning",
+        "code": 11
+    },
+    {
+        "name": "Ação",
+        "code": 12
+    },
+    {
+        "name": "Carros",
+        "code": 13
+    },
+    {
+        "name": "Colegial",
+        "code": 14
+    },
+    {
+        "name": "Comedy",
+        "code": 15
+    },
+    {
+        "name": "Comédia",
+        "code": 16
+    },
+    {
+        "name": "Cooking",
+        "code": 17
+    },
+    {
+        "name": "Criancas",
+        "code": 18
+    },
+    {
+        "name": "Crime",
+        "code": 19
+    },
+    {
+        "name": "Crossdress",
+        "code": 20
+    },
+    {
+        "name": "Crossdressing",
+        "code": 21
+    },
+    {
+        "name": "Culinaria",
+        "code": 22
+    },
+    {
+        "name": "Delinquents",
+        "code": 23
+    },
+    {
+        "name": "Dementia",
+        "code": 24
+    },
+    {
+        "name": "Demonios",
+        "code": 25
+    },
+    {
+        "name": "Demons",
+        "code": 26
+    },
+    {
+        "name": "Doujinshi",
+        "code": 27
+    },
+    {
+        "name": "Drama",
+        "code": 28
+    },
+    {
+        "name": "Ecchi",
+        "code": 29
+    },
+    {
+        "name": "Escolar",
+        "code": 30
+    },
+    {
+        "name": "Espaco",
+        "code": 31
+    },
+    {
+        "name": "Esporte",
+        "code": 32
+    },
+    {
+        "name": "Esportes",
+        "code": 33
+    },
+    {
+        "name": "Fan Colored",
+        "code": 34
+    },
+    {
+        "name": "Fantasia",
+        "code": 35
+    },
+    {
+        "name": "Fantasy",
+        "code": 36
+    },
+    {
+        "name": "Ficção",
+        "code": 37
+    },
+    {
+        "name": "Full Color",
+        "code": 38
+    },
+    {
+        "name": "Gender Bender",
+        "code": 39
+    },
+    {
+        "name": "Genderswap",
+        "code": 40
+    },
+    {
+        "name": "Ghosts",
+        "code": 41
+    },
+    {
+        "name": "Gore",
+        "code": 42
+    },
+    {
+        "name": "Gyaru",
+        "code": 43
+    },
+    {
+        "name": "Harém",
+        "code": 44
+    },
+    {
+        "name": "Hentai",
+        "code": 45
+    },
+    {
+        "name": "Historical",
+        "code": 46
+    },
+    {
+        "name": "Histórico",
+        "code": 47
+    },
+    {
+        "name": "Horror",
+        "code": 48
+    },
+    {
+        "name": "Incest",
+        "code": 49
+    },
+    {
+        "name": "Isekai",
+        "code": 50
+    },
+    {
+        "name": "Jogo",
+        "code": 51
+    },
+    {
+        "name": "Josei",
+        "code": 52
+    },
+    {
+        "name": "Loli",
+        "code": 53
+    },
+    {
+        "name": "Long Strip",
+        "code": 54
+    },
+    {
+        "name": "Maduro",
+        "code": 55
+    },
+    {
+        "name": "Mafia",
+        "code": 56
+    },
+    {
+        "name": "Magia",
+        "code": 57
+    },
+    {
+        "name": "Magic",
+        "code": 58
+    },
+    {
+        "name": "Magical Girls",
+        "code": 59
+    },
+    {
+        "name": "Manhua",
+        "code": 60
+    },
+    {
+        "name": "Manhwa",
+        "code": 61
+    },
+    {
+        "name": "Martial Arts",
+        "code": 62
+    },
+    {
+        "name": "Mecha",
+        "code": 63
+    },
+    {
+        "name": "Medical",
+        "code": 64
+    },
+    {
+        "name": "Militar",
+        "code": 65
+    },
+    {
+        "name": "Military",
+        "code": 66
+    },
+    {
+        "name": "Misterio",
+        "code": 67
+    },
+    {
+        "name": "Monster Girls",
+        "code": 68
+    },
+    {
+        "name": "Monsters",
+        "code": 69
+    },
+    {
+        "name": "Music",
+        "code": 70
+    },
+    {
+        "name": "Musical",
+        "code": 71
+    },
+    {
+        "name": "Mystery",
+        "code": 72
+    },
+    {
+        "name": "Ninja",
+        "code": 73
+    },
+    {
+        "name": "Office Workers",
+        "code": 74
+    },
+    {
+        "name": "Official Colored",
+        "code": 75
+    },
+    {
+        "name": "Omegaverse",
+        "code": 76
+    },
+    {
+        "name": "OneShot",
+        "code": 77
+    },
+    {
+        "name": "Parodia",
+        "code": 78
+    },
+    {
+        "name": "Philosophical",
+        "code": 79
+    },
+    {
+        "name": "Police",
+        "code": 80
+    },
+    {
+        "name": "Policial",
+        "code": 81
+    },
+    {
+        "name": "Post-Apocalyptic",
+        "code": 82
+    },
+    {
+        "name": "Psicológico",
+        "code": 83
+    },
+    {
+        "name": "Psychological",
+        "code": 84
+    },
+    {
+        "name": "Reencarnação",
+        "code": 85
+    },
+    {
+        "name": "Reincarnation",
+        "code": 86
+    },
+    {
+        "name": "Romance",
+        "code": 87
+    },
+    {
+        "name": "Samurai",
+        "code": 88
+    },
+    {
+        "name": "Scan",
+        "code": 89
+    },
+    {
+        "name": "School Life",
+        "code": 90
+    },
+    {
+        "name": "Sci-fi",
+        "code": 91
+    },
+    {
+        "name": "Seinen",
+        "code": 92
+    },
+    {
+        "name": "Sexual Violence",
+        "code": 93
+    },
+    {
+        "name": "Shota",
+        "code": 94
+    },
+    {
+        "name": "Shoujo",
+        "code": 95
+    },
+    {
+        "name": "Shoujo Ai",
+        "code": 96
+    },
+    {
+        "name": "Shoujo-ai",
+        "code": 97
+    },
+    {
+        "name": "Shounen",
+        "code": 98
+    },
+    {
+        "name": "Shounen Ai",
+        "code": 99
+    },
+    {
+        "name": "Slice of life",
+        "code": 100
+    },
+    {
+        "name": "Smut",
+        "code": 101
+    },
+    {
+        "name": "Sobrenatural",
+        "code": 102
+    },
+    {
+        "name": "Sports",
+        "code": 103
+    },
+    {
+        "name": "Super Poderes",
+        "code": 104
+    },
+    {
+        "name": "Superhero",
+        "code": 105
+    },
+    {
+        "name": "Supernatural",
+        "code": 106
+    },
+    {
+        "name": "Survival",
+        "code": 107
+    },
+    {
+        "name": "Suspense",
+        "code": 108
+    },
+    {
+        "name": "Terror",
+        "code": 109
+    },
+    {
+        "name": "Thriller",
+        "code": 110
+    },
+    {
+        "name": "Time Travel",
+        "code": 111
+    },
+    {
+        "name": "Traditional Games",
+        "code": 112
+    },
+    {
+        "name": "Tragedia",
+        "code": 113
+    },
+    {
+        "name": "Tragedy",
+        "code": 114
+    },
+    {
+        "name": "User Created",
+        "code": 115
+    },
+    {
+        "name": "Vampires",
+        "code": 116
+    },
+    {
+        "name": "Vampiros",
+        "code": 117
+    },
+    {
+        "name": "Vida Escolar",
+        "code": 118
+    },
+    {
+        "name": "Video Games",
+        "code": 119
+    },
+    {
+        "name": "Villainess",
+        "code": 120
+    },
+    {
+        "name": "Web Comic",
+        "code": 121
+    },
+    {
+        "name": "Webtoon",
+        "code": 122
+    },
+    {
+        "name": "Wuxia",
+        "code": 123
+    },
+    {
+        "name": "Yaoi",
+        "code": 124
+    },
+    {
+        "name": "Yuri",
+        "code": 125
+    },
+    {
+        "name": "Zombies",
+        "code": 126
+    },
+    {
+        "name": "Zumbi",
+        "code": 127
+    }
+]
