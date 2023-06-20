@@ -5,7 +5,7 @@ import { IMangasRepository } from 'src/core/abstracts/mangas/mangas-repostitory.
 import { Chapter } from 'src/core/entities/chapters';
 import { Manga, MangaSimplified } from 'src/core/entities/mangas';
 import { PrismaService } from '../prisma/prisma.service';
-import { NovelCoolManga } from '@prisma/client';
+import { NovelCoolManga, Prisma } from '@prisma/client';
 import axiosRetry from 'axios-retry';
 import { ImageAnalyzer } from 'src/utils';
 
@@ -153,23 +153,8 @@ export class MangasServicesService implements IMangasRepository {
       where: {
         hasCover: true,
         OR: [
-          {
-            name: {
-              in: searchTerms,
-              mode: 'insensitive',
-            },
-          },
-          {
-            synopsis: {
-              in: searchTerms,
-              mode: 'insensitive',
-            },
-          },
-          {
-            genres: {
-              hasSome: searchTerms,
-            },
-          },
+          ...this.createMultiFieldSearchQuery(searchTerms),
+          { genres: { hasSome: searchTerms } },
         ],
       },
     });
@@ -184,6 +169,34 @@ export class MangasServicesService implements IMangasRepository {
         hasCover: manga.hasCover,
       };
     });
+  }
+
+  private createMultiFieldSearchQuery(
+    searchTerms: string[],
+  ): Prisma.NovelCoolMangaWhereInput[] {
+    const nameSearchParams = searchTerms.map(
+      (term): Prisma.NovelCoolMangaWhereInput => {
+        return {
+          name: {
+            contains: term,
+            mode: 'insensitive',
+          },
+        };
+      },
+    );
+
+    const synopsisSearchParams = searchTerms.map(
+      (term): Prisma.NovelCoolMangaWhereInput => {
+        return {
+          synopsis: {
+            contains: term,
+            mode: 'insensitive',
+          },
+        };
+      },
+    );
+
+    return [...nameSearchParams, ...synopsisSearchParams];
   }
 
   private async scrapeAdvancedSearch(keyw: string): Promise<MangaSimplified[]> {
