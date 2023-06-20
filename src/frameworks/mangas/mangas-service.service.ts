@@ -8,6 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { NovelCoolManga, Prisma } from '@prisma/client';
 import axiosRetry from 'axios-retry';
 import { ImageAnalyzer } from 'src/utils';
+import { readJsonFileAsync } from 'src/utils/read-json-file';
 
 axiosRetry(axios, { retries: 3 });
 @Injectable()
@@ -21,6 +22,7 @@ export class MangasServicesService implements IMangasRepository {
     this.prisma = prisma;
     this.imageComparer = imageComparer;
   }
+  private genres = readJsonFileAsync('genres.json');
   private logger = new Logger('MangasServicesService');
 
   async getMangas(keywords: string[]): Promise<MangaSimplified[]> {
@@ -77,8 +79,22 @@ export class MangasServicesService implements IMangasRepository {
         return { ...manga, url: manga.url.trim() };
       });
     } else {
-      console.log(keywords);
-      return this.multiFieldSearchDb(keywords);
+      const genresInKeywords = [];
+      const keywordsCopy = [...keywords];
+
+      for (const keyword of keywordsCopy) {
+        if (!isNaN(Number(keyword))) {
+          genresInKeywords.push(this.genres[Number(keyword) - 1].name);
+          keywords = keywords.filter(
+            (word) => word !== this.genres[Number(keyword) - 1],
+          );
+        }
+      }
+
+      if (keywordsCopy.length === 0)
+        return this.multiFieldSearchDb(genresInKeywords);
+
+      return this.multiFieldSearchDb([...keywordsCopy, ...genresInKeywords]);
     }
   }
 
