@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import { CheerioAPI, load } from 'cheerio';
 import axios from 'axios';
@@ -6,6 +6,8 @@ import { IChaptersRepository } from 'src/core/abstracts';
 
 @Injectable()
 export class ChapterFrameworkService implements IChaptersRepository {
+  private logger = new Logger('ChapterFrameworkService');
+
   async getChapter(url: string): Promise<string[]> {
     try {
       const firstChapterPage = await axios.get(`${url}-10-1.html`);
@@ -27,7 +29,7 @@ export class ChapterFrameworkService implements IChaptersRepository {
 
       return data;
     } catch (e) {
-      console.log(e);
+      this.logger.error(e);
     }
   }
   getChapters(mangaUrl: string): Promise<string[]> {
