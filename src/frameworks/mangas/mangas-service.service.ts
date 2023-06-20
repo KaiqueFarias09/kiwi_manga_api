@@ -9,6 +9,7 @@ import { NovelCoolManga, Prisma } from '@prisma/client';
 import axiosRetry from 'axios-retry';
 import { ImageAnalyzer } from 'src/utils';
 import { readJsonFileAsync } from 'src/utils/read-json-file';
+import { join } from 'path';
 
 axiosRetry(axios, { retries: 3 });
 @Injectable()
@@ -22,7 +23,10 @@ export class MangasServicesService implements IMangasRepository {
     this.prisma = prisma;
     this.imageComparer = imageComparer;
   }
-  private genres = readJsonFileAsync('genres.json');
+
+  private genres = readJsonFileAsync(
+    join(__dirname, '../../../../genres.json'),
+  );
   private logger = new Logger('MangasServicesService');
 
   async getMangas(keywords: string[]): Promise<MangaSimplified[]> {
