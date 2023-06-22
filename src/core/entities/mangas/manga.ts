@@ -1,6 +1,6 @@
 import { Chapter } from '../chapters';
 
-export class Manga {
+export class MangaEntity {
   id?: string;
   name: string;
   url: string;
@@ -11,4 +11,5 @@ export class Manga {
   updatedAt: string;
   chapters: Chapter[];
   hasCover: boolean;
+  source = 'novelcool';
 }
