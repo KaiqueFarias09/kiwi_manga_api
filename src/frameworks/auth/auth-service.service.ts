@@ -1,10 +1,6 @@
-import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import * as argon from 'argon2';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { v4 as uuid } from 'uuid';
-
 import { IAuthService } from '../../core/abstracts/';
 import { SignupDto, SigninDto, SignTokenDto } from '../../core/dtos';
 import { PrismaService } from '../prisma/prisma.service';
