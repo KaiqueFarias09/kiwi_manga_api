@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { IMangasRepository } from 'src/core/abstracts/mangas/mangas-repostitory.abstract';
 import { MangasServicesService } from './mangas-service.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { MongoService } from '../prisma/prisma.service';
 import { ImageAnalyzer } from 'src/utils/image-analyzer';
 
 @Module({
@@ -10,7 +10,7 @@ import { ImageAnalyzer } from 'src/utils/image-analyzer';
       provide: IMangasRepository,
       useClass: MangasServicesService,
     },
-    PrismaService,
+    MongoService,
     ImageAnalyzer,
   ],
   exports: [IMangasRepository],

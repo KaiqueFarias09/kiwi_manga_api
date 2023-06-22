@@ -3,9 +3,9 @@ import axios from 'axios';
 import { AnyNode, Cheerio, CheerioAPI, load } from 'cheerio';
 import { IMangasRepository } from 'src/core/abstracts/mangas/mangas-repostitory.abstract';
 import { Chapter } from 'src/core/entities/chapters';
-import { Manga, MangaSimplified } from 'src/core/entities/mangas';
-import { PrismaService } from '../prisma/prisma.service';
-import { NovelCoolManga, Prisma } from '@prisma/client';
+import { MangaEntity, MangaSimplified } from 'src/core/entities/mangas';
+import { MongoService } from '../prisma/prisma.service';
+import { Manga, Prisma } from 'prisma/prisma/mongo-client';
 import axiosRetry from 'axios-retry';
 import { ImageAnalyzer } from 'src/utils';
 import { readJsonFileAsync } from 'src/utils/read-json-file';
@@ -14,10 +14,10 @@ import { join } from 'path';
 axiosRetry(axios, { retries: 3 });
 @Injectable()
 export class MangasServicesService implements IMangasRepository {
-  prisma: PrismaService;
+  prisma: MongoService;
   imageComparer: ImageAnalyzer;
   constructor(
-    @Inject(PrismaService) prisma: PrismaService,
+    @Inject(MongoService) prisma: MongoService,
     @Inject(ImageAnalyzer) imageComparer: ImageAnalyzer,
   ) {
     this.prisma = prisma;
@@ -29,81 +29,78 @@ export class MangasServicesService implements IMangasRepository {
 
   async getMangas(keywords: string[]): Promise<MangaSimplified[]> {
     if (keywords.length === 1) {
-      const keyword = keywords[0];
-      const scrappedMangas = await this.scrapeAdvancedSearch(keyword);
-      const scrappedMangaNames = scrappedMangas.map((manga) => manga.name);
-
-      const mangas = await this.searchMangaNamesDb([
-        keyword,
-        ...scrappedMangaNames,
-      ]);
-      const dbMangas: MangaSimplified[] = [];
-      if (mangas.length > 0) {
-        mangas.forEach((manga: NovelCoolManga) => {
-          dbMangas.push({
-            name: manga.name,
-            url: manga.url,
-            cover: manga.cover,
-            synopsis: manga.synopsis,
-            hasCover: manga.hasCover,
-          });
-        });
-      }
-
-      const uniqueMangas = this.removeDuplicatesWithSynopsis([
-        ...dbMangas,
-        ...scrappedMangas,
-      ]);
-      const mangasToAdd: MangaSimplified[] = uniqueMangas.filter((manga) => {
-        return manga.synopsis === '' && manga.name.includes(keyword);
-      });
-
-      const areCoverImagesValid = mangasToAdd.map((manga) =>
-        this.imageComparer.isImageValid(manga.cover),
-      );
-      const areCoverImageValidResult = await Promise.all(areCoverImagesValid);
-      if (mangasToAdd.length > 0) {
-        const scrappedMangas = await this.saveMangasToDb(
-          mangasToAdd,
-          areCoverImageValidResult,
-        );
-        const allMangas = this.removeDuplicatesWithSynopsis([
-          ...dbMangas,
-          ...scrappedMangas,
-        ]);
-        return allMangas.map(({ ...manga }: MangaSimplified) => {
-          return { ...manga, url: manga.url.trim() };
-        });
-      }
-
-      return dbMangas.map(({ ...manga }: MangaSimplified) => {
-        return { ...manga, url: manga.url.trim() };
-      });
+      return await this.oneKeywordSearch(keywords[0]);
     } else {
-      const genresInKeywords = [];
-      const keywordsCopy = [...keywords];
-
-      for (const keyword of keywordsCopy) {
-        if (!isNaN(Number(keyword))) {
-          genresInKeywords.push(this.genres[Number(keyword) - 1].name);
-          keywords = keywords.filter(
-            (word) => word !== this.genres[Number(keyword) - 1],
-          );
-        }
-      }
-
-      if (keywordsCopy.length === 0)
-        return this.multiFieldSearchDb(genresInKeywords);
-
-      return this.multiFieldSearchDb([...keywordsCopy, ...genresInKeywords]);
+      return await this.multiFieldSearch(keywords);
     }
+  }
+
+  private async multiFieldSearch(
+    keywords: string[],
+  ): Promise<MangaSimplified[]> {
+    const genresInKeywords = [];
+    const keywordsCopy = [...keywords];
+
+    for (const keyword of keywordsCopy) {
+      if (!isNaN(Number(keyword))) {
+        genresInKeywords.push(this.genres[Number(keyword) - 1].name);
+        keywords = keywords.filter(
+          (word) => word !== this.genres[Number(keyword) - 1],
+        );
+      }
+    }
+
+    if (keywordsCopy.length === 0)
+      return this.multiFieldSearchDb(genresInKeywords);
+
+    return this.multiFieldSearchDb([...keywordsCopy, ...genresInKeywords]);
+  }
+
+  private async oneKeywordSearch(keyword: string): Promise<MangaSimplified[]> {
+    const [scrappedMangas, mangas] = await Promise.all([
+      this.scrapeAdvancedSearch(keyword),
+      this.searchMangaNamesDb(keyword),
+    ]);
+
+    const dbMangas: MangaSimplified[] = [];
+    if (mangas.length > 0) {
+      mangas.forEach((manga: Manga) => {
+        dbMangas.push({
+          name: manga.name,
+          url: manga.url,
+          cover: manga.cover,
+          synopsis: manga.synopsis,
+          hasCover: manga.hasCover,
+        });
+      });
+    }
+
+    const uniqueMangas = this.removeDuplicatesWithSynopsis([
+      ...dbMangas,
+      ...scrappedMangas,
+    ]);
+    const mangasToAdd: MangaSimplified[] = uniqueMangas.filter((manga) => {
+      return manga.synopsis === '' && manga.name.includes(keyword);
+    });
+
+    const areCoverImagesValid = mangasToAdd.map((manga) =>
+      this.imageComparer.isImageValid(manga.cover),
+    );
+    const areCoverImageValidResult = await Promise.all(areCoverImagesValid);
+    if (mangasToAdd.length > 0) {
+      await this.saveMangasToDb(mangasToAdd, areCoverImageValidResult);
+      return await this.searchMangaNamesDb(keyword);
+    }
+
+    return await this.searchMangaNamesDb(keyword);
   }
 
   private async saveMangasToDb(
     mangasToAdd: MangaSimplified[],
     areValid: boolean[],
-  ): Promise<MangaSimplified[]> {
+  ): Promise<void> {
     try {
+      console.log(mangasToAdd);
       const mangaPages = await axios.all(
         mangasToAdd.map((manga) => {
           return axios.get(manga.url, { timeout: 30000 });
@@ -112,7 +109,7 @@ export class MangasServicesService implements IMangasRepository {
 
       const scrappedPages = mangaPages.map((page) => load(page.data));
 
-      const mangas: Manga[] = scrappedPages.map(
+      const mangas: MangaEntity[] = scrappedPages.map(
         (page: CheerioAPI, i: number) => {
           return this.createMangaEntity({
             scrappedMangaPage: page,
@@ -123,18 +120,35 @@ export class MangasServicesService implements IMangasRepository {
       );
 
       const validMangas = mangas.filter((manga) => manga.chapters.length > 0);
-      await this.prisma.novelCoolManga.createMany({
-        data: [...validMangas],
+      const promises = validMangas.map(async (manga) => {
+        try {
+          const result = await this.prisma.manga.create({
+            data: {
+              source: 'novelcool',
+              cover: manga.cover,
+              name: manga.name,
+              url: manga.url,
+              synopsis: manga.synopsis,
+              hasCover: manga.hasCover,
+              status: manga.status,
+              updatedAt: manga.updatedAt,
+              genres: manga.genres,
+              chapters: {
+                createMany: {
+                  data: manga.chapters,
+                },
+              },
+            },
+          });
+          return result;
+        } catch (error) {
+          console.error(error);
+          return null;
+        }
       });
-      return validMangas.map((manga) => {
-        return {
-          cover: manga.cover,
-          name: manga.name,
-          synopsis: manga.synopsis,
-          url: manga.url,
-          hasCover: manga.hasCover,
-        };
-      });
+
+      const results = await Promise.all(promises);
+      console.log(results.forEach((result) => console.log(result)));
     } catch (err) {
       if (err.code === 'ECONNABORTED') {
         this.logger.error(`A timeout happened on url ${err.config.url}`);
@@ -145,16 +159,17 @@ export class MangasServicesService implements IMangasRepository {
   }
 
   private async searchMangaNamesDb(
-    searchTerms: string[],
+    searchTerm: string,
   ): Promise<MangaSimplified[]> {
-    return this.prisma.novelCoolManga.findMany({
+    return this.prisma.manga.findMany({
       where: {
         name: {
-          in: searchTerms,
+          contains: searchTerm,
           mode: 'insensitive',
         },
       },
       select: {
+        id: true,
         name: true,
         cover: true,
         url: true,
@@ -167,7 +182,7 @@ export class MangasServicesService implements IMangasRepository {
   private async multiFieldSearchDb(
     searchTerms: string[],
   ): Promise<MangaSimplified[]> {
-    const mangas = await this.prisma.novelCoolManga.findMany({
+    const mangas = await this.prisma.manga.findMany({
       where: {
         hasCover: true,
         OR: [
@@ -191,20 +206,18 @@ export class MangasServicesService implements IMangasRepository {
 
   private createMultiFieldSearchQuery(
     searchTerms: string[],
-  ): Prisma.NovelCoolMangaWhereInput[] {
-    const nameSearchParams = searchTerms.map(
-      (term): Prisma.NovelCoolMangaWhereInput => {
-        return {
-          name: {
-            contains: term,
-            mode: 'insensitive',
-          },
-        };
-      },
-    );
+  ): Prisma.MangaWhereInput[] {
+    const nameSearchParams = searchTerms.map((term): Prisma.MangaWhereInput => {
+      return {
+        name: {
+          contains: term,
+          mode: 'insensitive',
+        },
+      };
+    });
 
     const synopsisSearchParams = searchTerms.map(
-      (term): Prisma.NovelCoolMangaWhereInput => {
+      (term): Prisma.MangaWhereInput => {
         return {
           synopsis: {
             contains: term,
@@ -288,11 +301,11 @@ export class MangasServicesService implements IMangasRepository {
     return validationInfo;
   }
 
-  async getRandomManga(): Promise<Manga> {
-    const count = await this.prisma.novelCoolManga.count();
+  async getRandomManga(): Promise<MangaEntity> {
+    const count = await this.prisma.manga.count();
     const skip = Math.floor(Math.random() * count);
 
-    const randomManga = await this.prisma.novelCoolManga.findFirst({
+    const randomManga = await this.prisma.manga.findFirst({
       skip,
       where: { hasCover: true },
     });
@@ -305,18 +318,43 @@ export class MangasServicesService implements IMangasRepository {
       updatedAt: randomManga.updatedAt,
       synopsis: randomManga.synopsis,
       genres: randomManga.genres,
-      chapters: randomManga.chapters,
+      chapters: await this.prisma.chapter.findMany({
+        where: { novelCoolMangaId: randomManga.id },
+      }),
       hasCover: randomManga.hasCover,
+      source: 'novelcool',
     };
   }
 
-  async getManga(mangaId: string): Promise<Manga> {
+  async getManga(mangaId: string): Promise<MangaEntity> {
     try {
-      const manga = await this.prisma.novelCoolManga.findFirst({
+      const manga = await this.prisma.manga.findFirst({
         where: {
           id: mangaId,
         },
+        include: {
+          chapters: true,
+        },
       });
+      if (manga.chapters.length === 0) {
+        const mangaPage = await axios.get(manga.url);
+        const scrappedPage = load(mangaPage.data);
+        const scrappedMangaInfo = this.createMangaEntity({
+          scrappedMangaPage: scrappedPage,
+          mangaPageUrl: manga.url,
+        });
+
+        this.prisma.manga.update({
+          data: {
+            chapters: { createMany: { data: scrappedMangaInfo.chapters } },
+          },
+          where: {
+            id: manga.id,
+            url: manga.url,
+          },
+        });
+      }
+
       return manga;
     } catch (e) {
       this.logger.log(e);
@@ -331,7 +369,7 @@ export class MangasServicesService implements IMangasRepository {
     scrappedMangaPage: CheerioAPI;
     mangaPageUrl: string;
     hasCover?: boolean;
-  }): Manga {
+  }): MangaEntity {
     return {
       name: scrappedMangaPage('.bk-side-intro-most > h1:nth-child(1)')
         .text()
@@ -356,6 +394,7 @@ export class MangasServicesService implements IMangasRepository {
       genres: this.getGenres(scrappedMangaPage),
       chapters: this.getChapters(scrappedMangaPage),
       hasCover: hasCover,
+      source: 'novelcool',
     };
   }
 
