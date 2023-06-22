@@ -24,15 +24,12 @@ export class MangasServicesService implements IMangasRepository {
     this.imageComparer = imageComparer;
   }
 
-  private genres = readJsonFileAsync(
-    join(__dirname, '../../../../genres.json'),
-  );
+  private genres = readJsonFileAsync(join(__dirname, '../../../genres.json'));
   private logger = new Logger('MangasServicesService');
 
   async getMangas(keywords: string[]): Promise<MangaSimplified[]> {
     if (keywords.length === 1) {
       const keyword = keywords[0];
-
       const scrappedMangas = await this.scrapeAdvancedSearch(keyword);
       const scrappedMangaNames = scrappedMangas.map((manga) => manga.name);
 
@@ -146,6 +143,7 @@ export class MangasServicesService implements IMangasRepository {
       }
     }
   }
+
   private async searchMangaNamesDb(
     searchTerms: string[],
   ): Promise<MangaSimplified[]> {
