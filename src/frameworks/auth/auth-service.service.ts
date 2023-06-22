@@ -3,16 +3,16 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { IAuthService } from '../../core/abstracts/';
 import { SignupDto, SigninDto, SignTokenDto } from '../../core/dtos';
-import { PrismaService } from '../prisma/prisma.service';
+import { MongoService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AuthService implements IAuthService {
-  prisma: PrismaService;
+  prisma: MongoService;
   jwt: JwtService;
   config: ConfigService;
 
   constructor(
-    @Inject(PrismaService) prisma: PrismaService,
+    @Inject(MongoService) prisma: MongoService,
     @Inject(JwtService) jwt: JwtService,
     @Inject(ConfigService) config: ConfigService,
   ) {
