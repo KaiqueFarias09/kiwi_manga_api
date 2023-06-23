@@ -3,22 +3,26 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import {
   AuthController,
   ChapterController,
+  CollectionsController,
+  FavoritesController,
   HealthController,
   MangasController,
+  ProfilePicController,
+  ScoreController,
 } from './controllers';
 import {
   AuthUseCasesModule,
   ChapterUseCaseModule,
+  CollectionsUseCaseModule,
+  FavoritesUseCaseModule,
   HealthUseCaseModule,
   MangasUseCaseModule,
+  ProfilePicUseCaseModule,
+  ScoreUseCaseModule,
 } from './use-cases';
 
 import { ConfigModule } from '@nestjs/config';
 import { RequestLoggerMiddleware } from './middlewares/request-logger.middleware';
-import { ScoreUseCaseModule } from './use-cases/score';
-import { ProfilePicModule } from './services/profile-pic/profile-pic.module';
-import { CollectionsUseCaseModule } from './use-cases/collections';
-import { FavoritesUseCaseModule } from './use-cases/favorites';
 
 @Module({
   controllers: [
@@ -26,6 +30,10 @@ import { FavoritesUseCaseModule } from './use-cases/favorites';
     ChapterController,
     MangasController,
     AuthController,
+    ScoreController,
+    ProfilePicController,
+    CollectionsController,
+    FavoritesController,
   ],
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -34,7 +42,7 @@ import { FavoritesUseCaseModule } from './use-cases/favorites';
     MangasUseCaseModule,
     AuthUseCasesModule,
     ScoreUseCaseModule,
-    ProfilePicModule,
+    ProfilePicUseCaseModule,
     CollectionsUseCaseModule,
     FavoritesUseCaseModule,
   ],
