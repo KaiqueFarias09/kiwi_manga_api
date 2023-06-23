@@ -8,7 +8,7 @@ export class MongoService extends PrismaClient {
     super({
       datasources: {
         db: {
-          url: config.get('DATABASE_URL'),
+          url: config.get('MONGODB_URL'),
         },
       },
     });

@@ -15,6 +15,10 @@ import {
 
 import { ConfigModule } from '@nestjs/config';
 import { RequestLoggerMiddleware } from './middlewares/request-logger.middleware';
+import { ScoreUseCaseModule } from './use-cases/score';
+import { ProfilePicModule } from './services/profile-pic/profile-pic.module';
+import { CollectionsUseCaseModule } from './use-cases/collections';
+import { FavoritesUseCaseModule } from './use-cases/favorites';
 
 @Module({
   controllers: [
@@ -29,6 +33,10 @@ import { RequestLoggerMiddleware } from './middlewares/request-logger.middleware
     ChapterUseCaseModule,
     MangasUseCaseModule,
     AuthUseCasesModule,
+    ScoreUseCaseModule,
+    ProfilePicModule,
+    CollectionsUseCaseModule,
+    FavoritesUseCaseModule,
   ],
 })
 export class AppModule implements NestModule {
