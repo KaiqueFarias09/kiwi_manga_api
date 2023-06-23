@@ -1,12 +1,47 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { IProfilePicRepository } from 'src/core/abstracts';
+import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
+import { UpdateProfilePicEntity } from 'src/core/entities';
 
 @Injectable()
 export class ProfilePicServiceService implements IProfilePicRepository {
-  findProfilePic(userId: string): Promise<string> {
-    throw new Error('Method not implemented.');
+  postgresService: PostgresService;
+  constructor(@Inject(PostgresService) postgresService: PostgresService) {
+    this.postgresService = postgresService;
   }
-  saveProfilePic(userId: string): Promise<string> {
-    throw new Error('Method not implemented.');
+
+  async findProfilePic(userId: string): Promise<string> {
+    const user = await this.postgresService.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        profilePicture: true,
+      },
+    });
+    console.log(user);
+    return user.profilePicture;
+  }
+
+  async updateProfilePicDto({
+    userId,
+    profilePic,
+  }: UpdateProfilePicEntity): Promise<{
+    profilePic: string;
+    userId: string;
+  }> {
+    const user = await this.postgresService.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        profilePicture: profilePic,
+      },
+    });
+
+    return {
+      profilePic: user.profilePicture,
+      userId: user.id,
+    };
   }
 }
