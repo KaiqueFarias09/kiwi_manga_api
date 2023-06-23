@@ -11,10 +11,7 @@ export class ProfilePicUseCase {
 
   async updateProfilePic(
     updateProfilePicEntity: UpdateProfilePicEntity,
-  ): Promise<{
-    profilePic: string;
-    userId: string;
-  }> {
+  ): Promise<string> {
     return this.profilePicRepository.updateProfilePicDto(
       updateProfilePicEntity,
     );

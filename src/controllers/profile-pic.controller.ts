@@ -1,5 +1,10 @@
 import { Body, Controller, Get, Inject, Param, Put } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiExtraModels,
+  ApiTags,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { UpdateProfilePicDto } from 'src/core/dtos';
 import { ProfilePicUseCase } from 'src/use-cases/profile-pic';
 
@@ -14,18 +19,34 @@ export class ProfilePicController {
   }
 
   @Get(':id')
-  async findProfilePic(@Param('id') userID: string): Promise<string> {
-    return await this.profilePicService.findProfilePic(userID);
+  async findProfilePic(@Param('id') userID: string) {
+    const profilePic = await this.profilePicService.findProfilePic(userID);
+    return { profilePic: profilePic };
   }
 
+  @ApiBody({
+    type: UpdateProfilePicDto,
+    examples: {
+      requestOne: {
+        summary: 'Update profile picture',
+        value: {
+          profilePic: 'https://www.example.com/profile-pic.png',
+        },
+      },
+    },
+  })
   @Put(':id')
-  updateProfilePic(
+  async updateProfilePic(
     @Param('id') userID: string,
     @Body() { profilePic }: UpdateProfilePicDto,
-  ): Promise<{ profilePic: string; userId: string }> {
-    return this.profilePicService.updateProfilePic({
-      profilePic: profilePic,
+  ) {
+    const updatedProfilePic = await this.profilePicService.updateProfilePic({
+      profilePic,
       userId: userID,
     });
+
+    return {
+      profilePic: updatedProfilePic,
+    };
   }
 }

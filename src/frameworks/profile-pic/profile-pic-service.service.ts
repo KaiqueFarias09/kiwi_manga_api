@@ -26,11 +26,8 @@ export class ProfilePicServiceService implements IProfilePicRepository {
   async updateProfilePicDto({
     userId,
     profilePic,
-  }: UpdateProfilePicEntity): Promise<{
-    profilePic: string;
-    userId: string;
-  }> {
-    const user = await this.postgresService.user.update({
+  }: UpdateProfilePicEntity): Promise<string> {
+    const data = await this.postgresService.user.update({
       where: {
         id: userId,
       },
@@ -39,9 +36,6 @@ export class ProfilePicServiceService implements IProfilePicRepository {
       },
     });
 
-    return {
-      profilePic: user.profilePicture,
-      userId: user.id,
-    };
+    return data.profilePicture;
   }
 }
