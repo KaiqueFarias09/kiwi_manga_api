@@ -4,7 +4,7 @@ import { AnyNode, Cheerio, CheerioAPI, load } from 'cheerio';
 import { IMangasRepository } from 'src/core/abstracts/mangas/mangas-repostitory.abstract';
 import { Chapter } from 'src/core/entities/chapters';
 import { MangaEntity, MangaSimplified } from 'src/core/entities/mangas';
-import { MongoService } from '../prisma/prisma.service';
+import { MongoService } from '../mongo-prisma/mongo-prisma.service';
 import { Manga, Prisma } from 'prisma/prisma/mongo-client';
 import axiosRetry from 'axios-retry';
 import { ImageAnalyzer } from 'src/utils';
@@ -16,6 +16,9 @@ axiosRetry(axios, { retries: 3 });
 export class MangasServicesService implements IMangasRepository {
   prisma: MongoService;
   imageComparer: ImageAnalyzer;
+  private genres = readJsonFileAsync(join(__dirname, '../../../genres.json'));
+  private logger = new Logger('MangasServicesService');
+
   constructor(
     @Inject(MongoService) prisma: MongoService,
     @Inject(ImageAnalyzer) imageComparer: ImageAnalyzer,
@@ -24,14 +27,71 @@ export class MangasServicesService implements IMangasRepository {
     this.imageComparer = imageComparer;
   }
 
-  private genres = readJsonFileAsync(join(__dirname, '../../../genres.json'));
-  private logger = new Logger('MangasServicesService');
-
   async getMangas(keywords: string[]): Promise<MangaSimplified[]> {
     if (keywords.length === 1) {
       return await this.oneKeywordSearch(keywords[0]);
     } else {
       return await this.multiFieldSearch(keywords);
+    }
+  }
+
+  async getRandomManga(): Promise<MangaEntity> {
+    const count = await this.prisma.manga.count();
+    const skip = Math.floor(Math.random() * count);
+
+    const randomManga = await this.prisma.manga.findFirst({
+      skip,
+      where: { hasCover: true },
+    });
+    return {
+      id: randomManga.id,
+      name: randomManga.name,
+      url: randomManga.url,
+      cover: randomManga.cover,
+      status: randomManga.status,
+      updatedAt: randomManga.updatedAt,
+      synopsis: randomManga.synopsis,
+      genres: randomManga.genres,
+      chapters: await this.prisma.chapter.findMany({
+        where: { novelCoolMangaId: randomManga.id },
+      }),
+      hasCover: randomManga.hasCover,
+      source: 'novelcool',
+    };
+  }
+
+  async getManga(mangaId: string): Promise<MangaEntity> {
+    try {
+      const manga = await this.prisma.manga.findFirst({
+        where: {
+          id: mangaId,
+        },
+        include: {
+          chapters: true,
+        },
+      });
+      if (manga.chapters.length === 0) {
+        const mangaPage = await axios.get(manga.url);
+        const scrappedPage = load(mangaPage.data);
+        const scrappedMangaInfo = this.createMangaEntity({
+          scrappedMangaPage: scrappedPage,
+          mangaPageUrl: manga.url,
+        });
+
+        this.prisma.manga.update({
+          data: {
+            chapters: { createMany: { data: scrappedMangaInfo.chapters } },
+          },
+          where: {
+            id: manga.id,
+            url: manga.url,
+          },
+        });
+      }
+
+      return manga;
+    } catch (e) {
+      this.logger.log(e);
     }
   }
 
@@ -299,66 +359,6 @@ export class MangasServicesService implements IMangasRepository {
       mangaViews: mangaViews,
     };
     return validationInfo;
-  }
-
-  async getRandomManga(): Promise<MangaEntity> {
-    const count = await this.prisma.manga.count();
-    const skip = Math.floor(Math.random() * count);
-
-    const randomManga = await this.prisma.manga.findFirst({
-      skip,
-      where: { hasCover: true },
-    });
-    return {
-      id: randomManga.id,
-      name: randomManga.name,
-      url: randomManga.url,
-      cover: randomManga.cover,
-      status: randomManga.status,
-      updatedAt: randomManga.updatedAt,
-      synopsis: randomManga.synopsis,
-      genres: randomManga.genres,
-      chapters: await this.prisma.chapter.findMany({
-        where: { novelCoolMangaId: randomManga.id },
-      }),
-      hasCover: randomManga.hasCover,
-      source: 'novelcool',
-    };
-  }
-
-  async getManga(mangaId: string): Promise<MangaEntity> {
-    try {
-      const manga = await this.prisma.manga.findFirst({
-        where: {
-          id: mangaId,
-        },
-        include: {
-          chapters: true,
-        },
-      });
-      if (manga.chapters.length === 0) {
-        const mangaPage = await axios.get(manga.url);
-        const scrappedPage = load(mangaPage.data);
-        const scrappedMangaInfo = this.createMangaEntity({
-          scrappedMangaPage: scrappedPage,
-          mangaPageUrl: manga.url,
-        });
-
-        this.prisma.manga.update({
-          data: {
-            chapters: { createMany: { data: scrappedMangaInfo.chapters } },
-          },
-          where: {
-            id: manga.id,
-            url: manga.url,
-          },
-        });
-      }
-
-      return manga;
-    } catch (e) {
-      this.logger.log(e);
-    }
   }
 
   private createMangaEntity({
