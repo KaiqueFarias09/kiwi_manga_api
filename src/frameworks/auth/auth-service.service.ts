@@ -1,18 +1,20 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { IAuthService } from '../../core/abstracts/';
-import { SignupDto, SigninDto, SignTokenDto } from '../../core/dtos';
-import { MongoService } from '../prisma/prisma.service';
+import { SigninDto, SignTokenDto, SignupDto } from '../../core/dtos';
+import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
+import * as argon from 'argon2';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 @Injectable()
 export class AuthService implements IAuthService {
-  prisma: MongoService;
+  prisma: PostgresService;
   jwt: JwtService;
   config: ConfigService;
 
   constructor(
-    @Inject(MongoService) prisma: MongoService,
+    @Inject(PostgresService) prisma: PostgresService,
     @Inject(JwtService) jwt: JwtService,
     @Inject(ConfigService) config: ConfigService,
   ) {
@@ -22,42 +24,36 @@ export class AuthService implements IAuthService {
   }
 
   async signup(signupDto: SignupDto) {
-    // // generate the password hash
-    // const hash = await argon.hash(signupDto.password);
-    // // save the new user in the db
-    // const id = uuid();
-    // try {
-    //   const user = await this.prisma.user.create({
-    //     data: {
-    //       id: id,
-    //       nickname: signupDto.nickname,
-    //       email: signupDto.email,
-    //       password: hash,
-    //       profile_pic: '',
-    //       score: 0,
-    //     },
-    //   });
-    //   return this.signToken({ user_id: user.id, user_email: user.email });
-    // } catch (error) {
-    //   if (error instanceof PrismaClientKnownRequestError) {
-    //     if (error.code === 'P2002') {
-    //       throw new ForbiddenException('Credentials taken');
-    //     }
-    //   }
-    //   throw error;
-    // }
+    const hash = await argon.hash(signupDto.password);
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          nickname: signupDto.nickname,
+          email: signupDto.email,
+          password: hash,
+        },
+      });
+      return this.signToken({ user_id: user.id, user_email: user.email });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw new ForbiddenException('Credentials taken');
+        }
+      }
+      throw error;
+    }
   }
 
   async signin(signinDto: SigninDto) {
-    // const user = await this.prisma.user.findUnique({
-    //   where: {
-    //     email: signinDto.email,
-    //   },
-    // });
-    // if (!user) throw new ForbiddenException('Credentials incorrect');
-    // const pwMatches = await argon.verify(user.password, signinDto.password);
-    // if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
-    // return this.signToken({ user_id: user.id, user_email: user.email });
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: signinDto.email,
+      },
+    });
+    if (!user) throw new ForbiddenException('Credentials incorrect');
+    const pwMatches = await argon.verify(user.password, signinDto.password);
+    if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
+    return this.signToken({ user_id: user.id, user_email: user.email });
   }
 
   async signToken({
