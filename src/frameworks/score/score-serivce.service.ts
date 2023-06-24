@@ -19,7 +19,7 @@ export class ScoreServiceService implements IScoreRepository {
       },
       data: {
         score: {
-          increment: increase,
+          increment: increase || 1,
         },
       },
     });
