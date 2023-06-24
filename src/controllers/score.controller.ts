@@ -1,9 +1,19 @@
-import { Body, Controller, Get, Inject, Param, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiTags } from '@nestjs/swagger';
 import { IncreaseScoreDto } from 'src/core/dtos';
 import { ScoreUseCase } from 'src/use-cases/score';
 
 @ApiTags('score')
+@UseGuards(AuthGuard('api-key'))
 @Controller('score')
 export class ScoreController {
   scoreService: ScoreUseCase;

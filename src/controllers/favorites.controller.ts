@@ -6,11 +6,14 @@ import {
   Inject,
   Param,
   Post,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiTags } from '@nestjs/swagger';
 import { CollectionMangaDto } from 'src/core/dtos';
 import { FavoritesUseCase } from 'src/use-cases';
 
+@UseGuards(AuthGuard('api-key'))
 @ApiTags('favorites')
 @Controller(':id/favorites')
 export class FavoritesController {

@@ -1,9 +1,19 @@
-import { Body, Controller, Get, Inject, Param, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiTags } from '@nestjs/swagger';
 import { UpdateProfilePicDto } from 'src/core/dtos';
 import { ProfilePicUseCase } from 'src/use-cases/profile-pic';
 
 @ApiTags('profile-pic')
+@UseGuards(AuthGuard('api-key'))
 @Controller('profile-pic')
 export class ProfilePicController {
   profilePicService: ProfilePicUseCase;
