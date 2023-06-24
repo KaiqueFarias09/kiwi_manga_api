@@ -1,5 +1,5 @@
 export class Collection {
-  id: string;
+  id?: string;
   name: string;
   description: string;
 }

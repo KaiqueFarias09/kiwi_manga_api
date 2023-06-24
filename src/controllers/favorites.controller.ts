@@ -8,11 +8,11 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { CollectionManga } from 'src/core/entities';
+import { CollectionMangaDto } from 'src/core/dtos';
 import { FavoritesUseCase } from 'src/use-cases';
 
 @ApiTags('favorites')
-@Controller()
+@Controller(':id/favorites')
 export class FavoritesController {
   favoritesService: FavoritesUseCase;
   constructor(
@@ -21,18 +21,21 @@ export class FavoritesController {
     this.favoritesService = favoritesUseCaseService;
   }
 
-  @Get(':id/favorites')
+  @Get()
   getFavorites(@Param('id') userId: string) {
     return this.favoritesService.getFavorites(userId);
   }
 
-  @Post(':id/favorites')
-  addFavorite(@Param('id') userId: string, @Body() manga: CollectionManga) {
+  @Post()
+  addFavorite(@Param('id') userId: string, @Body() manga: CollectionMangaDto) {
     return this.favoritesService.addFavorite(manga, userId);
   }
 
-  @Delete(':id/favorites')
-  removeFavorite(@Param('id') userId: string, @Body() manga: CollectionManga) {
+  @Delete()
+  removeFavorite(
+    @Param('id') userId: string,
+    @Body() manga: CollectionMangaDto,
+  ) {
     return this.favoritesService.removeFavorite(manga, userId);
   }
 }

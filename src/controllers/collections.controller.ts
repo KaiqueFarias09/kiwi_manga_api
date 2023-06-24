@@ -9,11 +9,17 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Collection, MangaSimplified } from 'src/core/entities';
+import {
+  CollectionDto,
+  CollectionIdDto,
+  DeleteMangaCollectionDto,
+} from 'src/core/dtos';
+import { AddMangaCollectionDto } from 'src/core/dtos/collections/add-manga-collection.dto';
+import { Collection } from 'src/core/entities';
 import { CollectionsUseCase } from 'src/use-cases/collections';
 
 @ApiTags('collections')
-@Controller('collections')
+@Controller(':id/collections')
 export class CollectionsController {
   collectionsService: CollectionsUseCase;
   constructor(
@@ -23,44 +29,55 @@ export class CollectionsController {
   }
 
   @Get()
-  findCollections(@Body() userId: string): Promise<Collection[]> {
+  findCollections(@Param('id') userId: string): Promise<Collection[]> {
     return this.collectionsService.findCollections(userId);
   }
 
   @Post()
-  saveCollection(userId: string): Promise<Collection> {
-    throw new Error('Method not implemented.');
-  }
-
-  @Delete(':id')
-  deleteCollection(@Param('id') collectionId: string) {
-    return this.collectionsService.deleteCollection(collectionId);
-  }
-
-  @Put(':id')
-  updateCollection(
-    @Param('id') collectionId: string,
-    @Body() collection: Collection,
+  saveCollection(
+    @Param('id') userId: string,
+    @Body() collectionDto: CollectionDto,
   ): Promise<Collection> {
+    return this.collectionsService.saveCollection(userId, collectionDto);
+  }
+
+  @Delete()
+  deleteCollection(@Body() deleteCollectionDto: CollectionIdDto) {
+    return this.collectionsService.deleteCollection(deleteCollectionDto.id);
+  }
+
+  @Put()
+  updateCollection(@Body() collection: CollectionDto): Promise<Collection> {
     return this.collectionsService.updateCollection(collection);
   }
 
-  @Get(':id')
-  findCollectionMangas(@Param('id') collectionId: string) {
-    return this.collectionsService.findCollectionMangas(collectionId);
+  @Get('mangas')
+  findCollectionMangas(@Body() collectionIdDto: CollectionIdDto) {
+    return this.collectionsService.findCollectionMangas(collectionIdDto.id);
   }
 
-  // TODO: Add manga info as an argument
-  @Post(':id/mangas/:mangaId')
-  addMangaToCollection(collectionId: string): Promise<MangaSimplified> {
-    throw new Error('Method not implemented.');
+  @Post('mangas')
+  addMangaToCollection(
+    @Body()
+    {
+      collectionId,
+      mangaCover,
+      mangaId,
+      mangaName,
+      mangaSynopsis,
+    }: AddMangaCollectionDto,
+  ) {
+    return this.collectionsService.addMangaToCollection(collectionId, {
+      cover: mangaCover,
+      name: mangaName,
+      synopsis: mangaSynopsis,
+      id: mangaId,
+    });
   }
 
-  // TODO: Add manga ID as an argument
-  @Delete(':id/mangas/:mangaId')
+  @Delete('mangas')
   deleteMangaFromCollection(
-    @Param('id') collectionId: string,
-    @Body() { mangaId }: { mangaId: string },
+    @Body() { collectionId, mangaId }: DeleteMangaCollectionDto,
   ) {
     return this.collectionsService.deleteMangaFromCollection(
       collectionId,
