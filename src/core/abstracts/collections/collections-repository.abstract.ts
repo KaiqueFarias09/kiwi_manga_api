@@ -1,18 +1,25 @@
-import { Collection, MangaSimplified } from 'src/core/entities';
+import { Collection, CollectionManga } from 'src/core/entities';
 
 export abstract class ICollectionsRepository {
   abstract findCollections(userId: string): Promise<Collection[]>;
-  abstract saveCollection(userId: string): Promise<Collection>;
-  abstract deleteCollection(userId: string): Promise<Collection>;
+  abstract saveCollection(
+    userId: string,
+    collectionInfo: Collection,
+  ): Promise<Collection>;
+  abstract deleteCollection(collectionId: string): Promise<Collection>;
   abstract updateCollection(
     updatedCollectionInfo: Collection,
   ): Promise<Collection>;
 
   abstract findCollectionMangas(
     collectionId: string,
-  ): Promise<MangaSimplified[]>;
-  abstract addMangaToCollection(collectionId: string): Promise<MangaSimplified>;
+  ): Promise<CollectionManga[]>;
+  abstract addMangaToCollection(
+    collectionId: string,
+    manga: CollectionManga,
+  ): Promise<Collection>;
   abstract deleteMangaFromCollection(
     collectionId: string,
-  ): Promise<MangaSimplified>;
+    mangaId: string,
+  ): Promise<Collection>;
 }

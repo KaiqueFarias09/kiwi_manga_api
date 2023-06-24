@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ICollectionsRepository } from 'src/core/abstracts';
 import { CollectionsServiceService } from './collections-service.service';
+import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
 
 @Module({
   providers: [
@@ -8,6 +9,7 @@ import { CollectionsServiceService } from './collections-service.service';
       provide: ICollectionsRepository,
       useClass: CollectionsServiceService,
     },
+    PostgresService,
   ],
   exports: [ICollectionsRepository],
 })

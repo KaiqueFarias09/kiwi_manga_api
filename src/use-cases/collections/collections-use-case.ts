@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ICollectionsRepository } from 'src/core/abstracts';
-import { Collection, MangaSimplified } from 'src/core/entities';
+import {
+  Collection,
+  CollectionManga,
+  MangaSimplified,
+} from 'src/core/entities';
 
 @Injectable()
 export class CollectionsUseCase {
@@ -9,22 +13,35 @@ export class CollectionsUseCase {
   findCollections(userId: string): Promise<Collection[]> {
     return this.collectionsRepository.findCollections(userId);
   }
-  saveCollection(userId: string): Promise<Collection> {
-    return this.collectionsRepository.saveCollection(userId);
+  saveCollection(
+    userId: string,
+    collectionInfo: Collection,
+  ): Promise<Collection> {
+    return this.collectionsRepository.saveCollection(userId, collectionInfo);
   }
-  deleteCollection(userId: string): Promise<Collection> {
-    return this.collectionsRepository.deleteCollection(userId);
+  deleteCollection(collectionId: string): Promise<Collection> {
+    return this.collectionsRepository.deleteCollection(collectionId);
   }
   updateCollection(updatedCollectionInfo: Collection): Promise<Collection> {
     return this.collectionsRepository.updateCollection(updatedCollectionInfo);
   }
-  findCollectionMangas(collectionId: string): Promise<MangaSimplified[]> {
+  findCollectionMangas(collectionId: string): Promise<CollectionManga[]> {
     return this.collectionsRepository.findCollectionMangas(collectionId);
   }
-  addMangaToCollection(collectionId: string): Promise<MangaSimplified> {
-    return this.collectionsRepository.addMangaToCollection(collectionId);
+  addMangaToCollection(
+    collectionId: string,
+    manga: CollectionManga,
+  ): Promise<Collection> {
+    return this.collectionsRepository.addMangaToCollection(collectionId, manga);
   }
-  deleteMangaFromCollection(collectionId: string): Promise<MangaSimplified> {
-    return this.collectionsRepository.deleteMangaFromCollection(collectionId);
+
+  async deleteMangaFromCollection(
+    collectionId: string,
+    mangaId: string,
+  ): Promise<Collection> {
+    return this.collectionsRepository.deleteMangaFromCollection(
+      collectionId,
+      mangaId,
+    );
   }
 }

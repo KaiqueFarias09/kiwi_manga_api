@@ -46,9 +46,7 @@ export class CollectionsController {
   }
 
   @Get(':id')
-  findCollectionMangas(
-    @Param('id') collectionId: string,
-  ): Promise<MangaSimplified[]> {
+  findCollectionMangas(@Param('id') collectionId: string) {
     return this.collectionsService.findCollectionMangas(collectionId);
   }
 
@@ -62,7 +60,11 @@ export class CollectionsController {
   @Delete(':id/mangas/:mangaId')
   deleteMangaFromCollection(
     @Param('id') collectionId: string,
-  ): Promise<MangaSimplified> {
-    return this.collectionsService.deleteMangaFromCollection(collectionId);
+    @Body() { mangaId }: { mangaId: string },
+  ) {
+    return this.collectionsService.deleteMangaFromCollection(
+      collectionId,
+      mangaId,
+    );
   }
 }
