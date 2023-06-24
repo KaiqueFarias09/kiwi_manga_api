@@ -1,10 +1,5 @@
 import { Body, Controller, Get, Inject, Param, Put } from '@nestjs/common';
-import {
-  ApiBody,
-  ApiExtraModels,
-  ApiTags,
-  getSchemaPath,
-} from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { UpdateProfilePicDto } from 'src/core/dtos';
 import { ProfilePicUseCase } from 'src/use-cases/profile-pic';
 
@@ -24,17 +19,6 @@ export class ProfilePicController {
     return { profilePic: profilePic };
   }
 
-  @ApiBody({
-    type: UpdateProfilePicDto,
-    examples: {
-      requestOne: {
-        summary: 'Update profile picture',
-        value: {
-          profilePic: 'https://www.example.com/profile-pic.png',
-        },
-      },
-    },
-  })
   @Put(':id')
   async updateProfilePic(
     @Param('id') userID: string,
