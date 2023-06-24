@@ -1,22 +1,86 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { IFavoritesRepository } from 'src/core/abstracts';
-import { MangaSimplified } from 'src/core/entities';
+import { CollectionManga, WasDeletedEntity } from 'src/core/entities';
+import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
 
 @Injectable()
 export class FavoritesServiceService implements IFavoritesRepository {
-  getFavorites(userId: string): Promise<MangaSimplified[]> {
-    throw new Error('Method not implemented.');
+  postgresService: PostgresService;
+  logger = new Logger('FavoritesServiceService');
+  constructor(@Inject(PostgresService) postgresService: PostgresService) {
+    this.postgresService = postgresService;
   }
-  addFavorite(
-    manga: MangaSimplified,
-    userId: string,
-  ): Promise<MangaSimplified> {
-    throw new Error('Method not implemented.');
+
+  async getFavorites(userId: string): Promise<CollectionManga[]> {
+    const data = await this.postgresService.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        FavoriteManga: {
+          include: {
+            manga: true,
+          },
+        },
+      },
+    });
+
+    return data.FavoriteManga.map((manga) => {
+      return manga.manga;
+    });
   }
-  removeFavorite(
-    manga: MangaSimplified,
+
+  async addFavorite(
+    manga: CollectionManga,
     userId: string,
-  ): Promise<MangaSimplified> {
-    throw new Error('Method not implemented.');
+  ): Promise<CollectionManga> {
+    await this.postgresService.favoriteManga.create({
+      data: {
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        manga: {
+          connectOrCreate: {
+            where: {
+              id: manga.id,
+            },
+            create: {
+              name: manga.name,
+              cover: manga.cover,
+              synopsis: manga.synopsis,
+              id: manga.id,
+            },
+          },
+        },
+      },
+    });
+
+    return manga;
+  }
+
+  async removeFavorite(
+    manga: CollectionManga,
+    userId: string,
+  ): Promise<WasDeletedEntity> {
+    try {
+      await this.postgresService.favoriteManga.delete({
+        where: {
+          mangaId_userId: {
+            mangaId: manga.id,
+            userId: userId,
+          },
+        },
+      });
+      return {
+        deleted: true,
+      };
+    } catch (e) {
+      this.logger.error(e);
+      return {
+        deleted: false,
+      };
+    }
   }
 }

@@ -33,7 +33,7 @@ export class CollectionsController {
   }
 
   @Delete(':id')
-  deleteCollection(@Param('id') collectionId: string): Promise<Collection> {
+  deleteCollection(@Param('id') collectionId: string) {
     return this.collectionsService.deleteCollection(collectionId);
   }
 

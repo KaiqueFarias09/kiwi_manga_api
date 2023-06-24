@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { IFavoritesRepository } from 'src/core/abstracts';
 import { FavoritesServiceService } from './favorites-service.service';
+import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
 
 @Module({
   providers: [
@@ -8,6 +9,7 @@ import { FavoritesServiceService } from './favorites-service.service';
       provide: IFavoritesRepository,
       useClass: FavoritesServiceService,
     },
+    PostgresService,
   ],
   exports: [IFavoritesRepository],
 })

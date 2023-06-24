@@ -3,7 +3,7 @@ import { ICollectionsRepository } from 'src/core/abstracts';
 import {
   Collection,
   CollectionManga,
-  MangaSimplified,
+  WasDeletedEntity,
 } from 'src/core/entities';
 
 @Injectable()
@@ -19,7 +19,7 @@ export class CollectionsUseCase {
   ): Promise<Collection> {
     return this.collectionsRepository.saveCollection(userId, collectionInfo);
   }
-  deleteCollection(collectionId: string): Promise<Collection> {
+  deleteCollection(collectionId: string): Promise<WasDeletedEntity> {
     return this.collectionsRepository.deleteCollection(collectionId);
   }
   updateCollection(updatedCollectionInfo: Collection): Promise<Collection> {
@@ -38,7 +38,7 @@ export class CollectionsUseCase {
   async deleteMangaFromCollection(
     collectionId: string,
     mangaId: string,
-  ): Promise<Collection> {
+  ): Promise<WasDeletedEntity> {
     return this.collectionsRepository.deleteMangaFromCollection(
       collectionId,
       mangaId,

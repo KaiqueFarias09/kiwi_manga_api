@@ -1,13 +1,13 @@
-import { MangaSimplified } from 'src/core/entities';
+import { CollectionManga, WasDeletedEntity } from 'src/core/entities';
 
 export abstract class IFavoritesRepository {
-  abstract getFavorites(userId: string): Promise<MangaSimplified[]>;
+  abstract getFavorites(userId: string): Promise<CollectionManga[]>;
   abstract addFavorite(
-    manga: MangaSimplified,
+    manga: CollectionManga,
     userId: string,
-  ): Promise<MangaSimplified>;
+  ): Promise<CollectionManga>;
   abstract removeFavorite(
-    manga: MangaSimplified,
+    manga: CollectionManga,
     userId: string,
-  ): Promise<MangaSimplified>;
+  ): Promise<WasDeletedEntity>;
 }

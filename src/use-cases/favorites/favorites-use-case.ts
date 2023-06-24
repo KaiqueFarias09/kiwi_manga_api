@@ -1,24 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { IFavoritesRepository } from 'src/core/abstracts';
-import { MangaSimplified } from 'src/core/entities';
+import { CollectionManga, WasDeletedEntity } from 'src/core/entities';
 
 @Injectable()
 export class FavoritesUseCase {
   constructor(private readonly favoritesRepository: IFavoritesRepository) {}
 
-  getFavorites(userId: string): Promise<MangaSimplified[]> {
+  getFavorites(userId: string): Promise<CollectionManga[]> {
     return this.favoritesRepository.getFavorites(userId);
   }
   addFavorite(
-    manga: MangaSimplified,
+    manga: CollectionManga,
     userId: string,
-  ): Promise<MangaSimplified> {
+  ): Promise<CollectionManga> {
     return this.favoritesRepository.addFavorite(manga, userId);
   }
   removeFavorite(
-    manga: MangaSimplified,
+    manga: CollectionManga,
     userId: string,
-  ): Promise<MangaSimplified> {
+  ): Promise<WasDeletedEntity> {
     return this.favoritesRepository.removeFavorite(manga, userId);
   }
 }

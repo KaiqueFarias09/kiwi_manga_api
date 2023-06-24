@@ -1,11 +1,16 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ICollectionsRepository } from 'src/core/abstracts';
-import { Collection, CollectionManga } from 'src/core/entities';
+import {
+  Collection,
+  CollectionManga,
+  WasDeletedEntity,
+} from 'src/core/entities';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
 
 @Injectable()
 export class CollectionsServiceService implements ICollectionsRepository {
   postgresService: PostgresService;
+  logger = new Logger('CollectionsServiceService');
   constructor(@Inject(PostgresService) postgresService: PostgresService) {
     this.postgresService = postgresService;
   }
@@ -44,14 +49,23 @@ export class CollectionsServiceService implements ICollectionsRepository {
     return newCollection;
   }
 
-  async deleteCollection(collectionId: string): Promise<Collection> {
-    const collection = await this.postgresService.collection.delete({
-      where: {
-        id: collectionId,
-      },
-    });
+  async deleteCollection(collectionId: string): Promise<WasDeletedEntity> {
+    try {
+      await this.postgresService.collection.delete({
+        where: {
+          id: collectionId,
+        },
+      });
 
-    return collection;
+      return {
+        deleted: true,
+      };
+    } catch (error) {
+      this.logger.error(error);
+      return {
+        deleted: false,
+      };
+    }
   }
 
   async updateCollection({
@@ -130,22 +144,28 @@ export class CollectionsServiceService implements ICollectionsRepository {
   async deleteMangaFromCollection(
     collectionId: string,
     mangaId: string,
-  ): Promise<Collection> {
-    const updatedCollection = await this.postgresService.collection.update({
-      where: {
-        id: collectionId,
-      },
-      data: {
-        MangaCollection: {
-          delete: {
-            mangaId_collectionId: {
-              mangaId: mangaId,
-              collectionId: collectionId,
+  ): Promise<WasDeletedEntity> {
+    try {
+      await this.postgresService.collection.update({
+        where: {
+          id: collectionId,
+        },
+        data: {
+          MangaCollection: {
+            delete: {
+              mangaId_collectionId: {
+                mangaId: mangaId,
+                collectionId: collectionId,
+              },
             },
           },
         },
-      },
-    });
-    return updatedCollection;
+      });
+
+      return { deleted: true };
+    } catch (error) {
+      this.logger.error(error);
+      return { deleted: false };
+    }
   }
 }

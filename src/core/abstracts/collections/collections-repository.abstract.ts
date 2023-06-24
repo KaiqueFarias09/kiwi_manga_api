@@ -1,4 +1,8 @@
-import { Collection, CollectionManga } from 'src/core/entities';
+import {
+  Collection,
+  CollectionManga,
+  WasDeletedEntity,
+} from 'src/core/entities';
 
 export abstract class ICollectionsRepository {
   abstract findCollections(userId: string): Promise<Collection[]>;
@@ -6,7 +10,7 @@ export abstract class ICollectionsRepository {
     userId: string,
     collectionInfo: Collection,
   ): Promise<Collection>;
-  abstract deleteCollection(collectionId: string): Promise<Collection>;
+  abstract deleteCollection(collectionId: string): Promise<WasDeletedEntity>;
   abstract updateCollection(
     updatedCollectionInfo: Collection,
   ): Promise<Collection>;
@@ -21,5 +25,5 @@ export abstract class ICollectionsRepository {
   abstract deleteMangaFromCollection(
     collectionId: string,
     mangaId: string,
-  ): Promise<Collection>;
+  ): Promise<WasDeletedEntity>;
 }
