@@ -1,5 +1,6 @@
-export abstract class IChaptersRepository {
-  abstract getChapter(url: string): Promise<string[]>;
+import { Chapter } from 'src/core/entities';
 
-  abstract getChapters(mangaUrl: string): Promise<string[]>;
+export abstract class IChaptersRepository {
+  abstract getChapter(id: string): Promise<string[]>;
+  abstract getChapters(mangaId: string): Promise<Chapter[]>;
 }

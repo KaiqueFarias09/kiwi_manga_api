@@ -392,7 +392,7 @@ export class MangasServicesService implements IMangasRepository {
         .text()
         .trim(),
       genres: this.getGenres(scrappedMangaPage),
-      chapters: this.getChapters(scrappedMangaPage),
+      chapters: this.scrapeChapters(scrappedMangaPage),
       hasCover: hasCover,
       source: 'novelcool',
     };
@@ -410,7 +410,7 @@ export class MangasServicesService implements IMangasRepository {
     return genres;
   }
 
-  private getChapters(mangaPage: CheerioAPI): Chapter[] {
+  private scrapeChapters(mangaPage: CheerioAPI): Chapter[] {
     const chapters: Chapter[] = [];
     mangaPage('div.chp-item').each((_, el) => {
       const chapter = mangaPage(el).find('a:nth-child(1)');

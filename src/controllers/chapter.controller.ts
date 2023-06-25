@@ -1,16 +1,31 @@
-import { Controller, Get, Headers, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags } from '@nestjs/swagger';
 import { ChapterUseCase } from 'src/use-cases/chapters';
 
 @ApiTags('chapters')
-@Controller()
+@Controller('chapters')
 @UseGuards(AuthGuard('api-key'))
 export class ChapterController {
-  constructor(private chapterService: ChapterUseCase) {}
+  chapterService: ChapterUseCase;
+  constructor(@Inject(ChapterUseCase) chapterService: ChapterUseCase) {
+    this.chapterService = chapterService;
+  }
 
-  @Get('read_manga')
-  async getChapter(@Headers('url') url: string) {
-    return this.chapterService.getChapter(url);
+  @Get()
+  async getChapters(@Query() { mangaId }: { mangaId: string }) {
+    return this.chapterService.getChapters(mangaId);
+  }
+
+  @Get(':chapterId')
+  async getChapter(@Param('chapterId') chapterId: string) {
+    return this.chapterService.getChapter(chapterId);
   }
 }
