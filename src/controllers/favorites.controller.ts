@@ -9,12 +9,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { CollectionMangaDto } from 'src/core/dtos';
 import { FavoritesUseCase } from 'src/use-cases';
 
-@UseGuards(AuthGuard('api-key'))
 @ApiTags('favorites')
+@ApiSecurity('Authorization')
+@UseGuards(AuthGuard('api-key'))
 @Controller(':id/favorites')
 export class FavoritesController {
   favoritesService: FavoritesUseCase;

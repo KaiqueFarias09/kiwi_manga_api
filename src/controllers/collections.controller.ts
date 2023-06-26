@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 import {
   CollectionDto,
   CollectionIdDto,
@@ -21,6 +21,7 @@ import { Collection } from 'src/core/entities';
 import { CollectionsUseCase } from 'src/use-cases/collections';
 
 @ApiTags('collections')
+@ApiSecurity('Authorization')
 @UseGuards(AuthGuard('api-key'))
 @Controller(':id/collections')
 export class CollectionsController {

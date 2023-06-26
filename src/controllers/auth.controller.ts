@@ -7,12 +7,13 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { SigninDto, SignupDto } from '../core/dtos';
-import { AuthServiceUseCases } from 'src/use-cases/auth/auth-service-use-cases';
-import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { AuthServiceUseCases } from 'src/use-cases/auth/auth-service-use-cases';
+import { SigninDto, SignupDto } from '../core/dtos';
 
 @ApiTags('auth')
+@ApiSecurity('Authorization')
 @UseGuards(AuthGuard('api-key'))
 @Controller('auth')
 export class AuthController {

@@ -7,10 +7,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { ChapterUseCase } from 'src/use-cases/chapters';
 
 @ApiTags('chapters')
+@ApiSecurity('Authorization')
 @Controller('chapters')
 @UseGuards(AuthGuard('api-key'))
 export class ChapterController {

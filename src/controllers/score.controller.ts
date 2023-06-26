@@ -8,11 +8,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { IncreaseScoreDto } from 'src/core/dtos';
 import { ScoreUseCase } from 'src/use-cases/score';
 
 @ApiTags('score')
+@ApiSecurity('Authorization')
 @UseGuards(AuthGuard('api-key'))
 @Controller('score')
 export class ScoreController {
