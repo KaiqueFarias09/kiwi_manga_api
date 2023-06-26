@@ -22,7 +22,13 @@ import {
 } from './use-cases';
 
 import { ConfigModule } from '@nestjs/config';
+import { ApiSecurity } from '@nestjs/swagger';
+import { UsersController } from './controllers/users.controller';
+import { MongoPrismaModule } from './frameworks/mongo-prisma/mongo-prisma.module';
+import { PostgresPrismaModule } from './frameworks/postgres-prisma/postgres-prisma.module';
+import { PasswordVerifierMiddleware } from './middlewares/password-verifier.middleware';
 import { RequestLoggerMiddleware } from './middlewares/request-logger.middleware';
+import { UsersUseCaseModule } from './use-cases/users';
 
 @Module({
   controllers: [
@@ -34,6 +40,7 @@ import { RequestLoggerMiddleware } from './middlewares/request-logger.middleware
     ProfilePicController,
     CollectionsController,
     FavoritesController,
+    UsersController,
   ],
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -45,10 +52,15 @@ import { RequestLoggerMiddleware } from './middlewares/request-logger.middleware
     ProfilePicUseCaseModule,
     CollectionsUseCaseModule,
     FavoritesUseCaseModule,
+    UsersUseCaseModule,
+    PostgresPrismaModule,
+    MongoPrismaModule,
   ],
 })
+@ApiSecurity('Authorization')
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(RequestLoggerMiddleware).forRoutes('*');
+    consumer.apply(PasswordVerifierMiddleware).forRoutes('users');
   }
 }
