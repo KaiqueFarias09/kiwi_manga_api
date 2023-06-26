@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IScoreRepository } from 'src/core/abstracts';
+import { IScoreRepository } from '../../core/abstracts';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
 
 @Injectable()

@@ -1,10 +1,10 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { ICollectionsRepository } from 'src/core/abstracts';
+import { ICollectionsRepository } from '../../core/abstracts';
 import {
   Collection,
   CollectionManga,
   WasDeletedEntity,
-} from 'src/core/entities';
+} from '../../core/entities';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
 
 @Injectable()

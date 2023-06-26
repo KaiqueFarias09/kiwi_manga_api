@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { IUsersRepositoryAbstract } from 'src/core/abstracts';
+import { IUsersRepositoryAbstract } from '../../core/abstracts';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
 import { UsersServiceService } from './users-service.service';
 

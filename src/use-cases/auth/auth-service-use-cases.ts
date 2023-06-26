@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IAuthService } from '../../core/abstracts';
-import { SignupDto, SigninDto } from 'src/core/dtos';
+import { SigninDto, SignupDto } from '../../core/dtos';
 
 @Injectable()
 export class AuthServiceUseCases implements IAuthService {

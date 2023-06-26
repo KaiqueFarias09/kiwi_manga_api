@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IProfilePicRepository } from 'src/core/abstracts';
+import { IProfilePicRepository } from '../../core/abstracts';
+import { UpdateProfilePicEntity } from '../../core/entities';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
-import { UpdateProfilePicEntity } from 'src/core/entities';
 
 @Injectable()
 export class ProfilePicServiceService implements IProfilePicRepository {

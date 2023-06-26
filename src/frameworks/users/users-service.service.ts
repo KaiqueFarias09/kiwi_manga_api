@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as argon from 'argon2';
-import { IUsersRepositoryAbstract } from 'src/core/abstracts';
-import { SuccessEntity, WasDeletedEntity } from 'src/core/entities';
+import { IUsersRepositoryAbstract } from '../../core/abstracts';
+import { SuccessEntity, WasDeletedEntity } from '../../core/entities';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
 
 @Injectable()

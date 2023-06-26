@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { IMangasRepository } from 'src/core/abstracts/mangas/mangas-repostitory.abstract';
-import { MangaEntity, MangaSimplified } from 'src/core/entities/mangas';
+import { IMangasRepository } from '../../core/abstracts/';
+import { MangaEntity, MangaSimplified } from '../../core/entities/';
 
 @Injectable()
 export class MangasUseCase {

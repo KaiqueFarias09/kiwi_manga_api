@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { IFavoritesRepository } from 'src/core/abstracts';
-import { CollectionManga, WasDeletedEntity } from 'src/core/entities';
+import { IFavoritesRepository } from '../../core/abstracts';
+import { CollectionManga, WasDeletedEntity } from '../../core/entities';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
 
 @Injectable()

@@ -1,4 +1,4 @@
-import { UpdateProfilePicEntity } from 'src/core/entities/';
+import { UpdateProfilePicEntity } from '../../entities/';
 
 export abstract class IProfilePicRepository {
   abstract findProfilePic(userId: string): Promise<string>;

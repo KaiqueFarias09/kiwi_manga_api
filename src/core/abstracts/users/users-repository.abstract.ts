@@ -1,4 +1,4 @@
-import { SuccessEntity, WasDeletedEntity } from 'src/core/entities';
+import { SuccessEntity, WasDeletedEntity } from '../../entities';
 
 export abstract class IUsersRepositoryAbstract {
   abstract updatePassword({

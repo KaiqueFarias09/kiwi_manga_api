@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { IncreaseScoreDto } from 'src/core/dtos';
 import { ScoreUseCase } from 'src/use-cases/score';
+import { IncreaseScoreDto } from '../core/dtos';
 
 @ApiTags('score')
 @ApiSecurity('Authorization')

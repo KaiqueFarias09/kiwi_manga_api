@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { ICollectionsRepository } from 'src/core/abstracts';
-import { CollectionsServiceService } from './collections-service.service';
+import { ICollectionsRepository } from '../../core/abstracts';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
+import { CollectionsServiceService } from './collections-service.service';
 
 @Module({
   providers: [

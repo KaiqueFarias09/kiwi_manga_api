@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { ChapterUseCase } from 'src/use-cases/chapters';
+import { ChapterUseCase } from '../use-cases';
 
 @ApiTags('chapters')
 @ApiSecurity('Authorization')

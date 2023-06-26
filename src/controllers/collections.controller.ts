@@ -12,13 +12,13 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 import {
+  AddMangaCollectionDto,
   CollectionDto,
   CollectionIdDto,
   DeleteMangaCollectionDto,
-} from 'src/core/dtos';
-import { AddMangaCollectionDto } from 'src/core/dtos/collections/add-manga-collection.dto';
-import { Collection } from 'src/core/entities';
-import { CollectionsUseCase } from 'src/use-cases/collections';
+} from '../core/dtos';
+import { Collection } from '../core/entities';
+import { CollectionsUseCase } from '../use-cases';
 
 @ApiTags('collections')
 @ApiSecurity('Authorization')

@@ -10,8 +10,8 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { CollectionMangaDto } from 'src/core/dtos';
-import { FavoritesUseCase } from 'src/use-cases';
+import { CollectionMangaDto } from '../core/dtos';
+import { FavoritesUseCase } from '../use-cases';
 
 @ApiTags('favorites')
 @ApiSecurity('Authorization')

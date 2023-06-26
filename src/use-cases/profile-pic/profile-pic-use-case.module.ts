@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
+import { ProfilePicModule } from '../../services/profile-pic/profile-pic.module';
 import { ProfilePicUseCase } from './profile-pic-use-case';
-import { ProfilePicModule } from 'src/services/profile-pic/profile-pic.module';
 
 @Module({
   imports: [ProfilePicModule],

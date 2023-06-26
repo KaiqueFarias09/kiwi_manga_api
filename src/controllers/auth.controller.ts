@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { AuthServiceUseCases } from 'src/use-cases/auth/auth-service-use-cases';
+import { AuthServiceUseCases } from '../use-cases/auth/auth-service-use-cases';
 import { SigninDto, SignupDto } from '../core/dtos';
 
 @ApiTags('auth')

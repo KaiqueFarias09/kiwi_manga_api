@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { IProfilePicRepository } from 'src/core/abstracts';
-import { UpdateProfilePicEntity } from 'src/core/entities';
+import { IProfilePicRepository } from '../../core/abstracts';
+import { UpdateProfilePicEntity } from '../../core/entities';
 
 @Injectable()
 export class ProfilePicUseCase {

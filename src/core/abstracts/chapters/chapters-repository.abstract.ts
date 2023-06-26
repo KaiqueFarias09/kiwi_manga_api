@@ -1,4 +1,4 @@
-import { Chapter } from 'src/core/entities';
+import { Chapter } from '../../entities';
 
 export abstract class IChaptersRepository {
   abstract getChapter(id: string): Promise<string[]>;

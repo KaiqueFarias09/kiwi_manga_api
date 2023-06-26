@@ -3,8 +3,8 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import { CheerioAPI, load } from 'cheerio';
-import { IChaptersRepository } from 'src/core/abstracts';
-import { Chapter } from 'src/core/entities';
+import { IChaptersRepository } from '../../core/abstracts';
+import { Chapter } from '../../core/entities';
 import { MongoService } from '../mongo-prisma/mongo-prisma.service';
 
 axiosRetry(axios, { retries: 3 });

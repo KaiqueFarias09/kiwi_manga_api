@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { IChaptersRepository } from 'src/core/abstracts/';
-import { Chapter } from 'src/core/entities';
+import { IChaptersRepository } from '../../core/abstracts/';
+import { Chapter } from '../../core/entities';
 
 @Module({})
 export class ChapterUseCase implements IChaptersRepository {

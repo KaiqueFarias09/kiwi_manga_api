@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IUsersRepositoryAbstract } from 'src/core/abstracts';
-import { SuccessEntity, WasDeletedEntity } from 'src/core/entities';
+import { IUsersRepositoryAbstract } from '../../core/abstracts';
+import { SuccessEntity, WasDeletedEntity } from '../../core/entities';
 
 @Injectable()
 export class UsersUseCase {

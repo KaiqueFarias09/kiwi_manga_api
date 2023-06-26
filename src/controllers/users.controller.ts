@@ -1,12 +1,12 @@
 import { Body, Controller, Delete, Param, Patch } from '@nestjs/common';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { UsersUseCase } from 'src/use-cases/users';
 import {
   DeleteAccountDto,
   UpdateEmailDto,
   UpdateNicknameDto,
   UpdatePasswordDto,
-} from 'src/core/dtos';
-import { UsersUseCase } from 'src/use-cases/users';
+} from '../core/dtos';
 
 @ApiTags('users')
 @ApiSecurity('Authorization')

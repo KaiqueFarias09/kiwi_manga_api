@@ -1,9 +1,9 @@
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { QueryDto } from 'src/core/dtos/manga-list';
+import { QueryDto } from '../core/dtos';
 
-import { MangasUseCase } from 'src/use-cases/mangas/mangas-use-case';
+import { MangasUseCase } from '../use-cases/mangas/mangas-use-case';
 
 @ApiTags('mangas')
 @ApiSecurity('Authorization')

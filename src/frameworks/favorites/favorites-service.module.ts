@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { IFavoritesRepository } from 'src/core/abstracts';
-import { FavoritesServiceService } from './favorites-service.service';
+import { IFavoritesRepository } from '../../core/abstracts';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
+import { FavoritesServiceService } from './favorites-service.service';
 
 @Module({
   providers: [

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
+import { ChapterModule } from '../../services/chapters/chapter.module';
 import { ChapterUseCase } from './chapter-use-case';
-import { ChapterModule } from 'src/services/chapters/chapter.module';
 
 @Module({
   imports: [ChapterModule],

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { IScoreRepository } from 'src/core/abstracts';
+import { IScoreRepository } from '../../core/abstracts';
 
 @Injectable()
 export class ScoreUseCase {

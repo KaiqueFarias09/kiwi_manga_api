@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { UpdateProfilePicDto } from 'src/core/dtos';
-import { ProfilePicUseCase } from 'src/use-cases/profile-pic';
+import { ProfilePicUseCase } from '../use-cases/profile-pic';
+import { UpdateProfilePicDto } from '../core/dtos';
 
 @ApiTags('profile-pic')
 @ApiSecurity('Authorization')

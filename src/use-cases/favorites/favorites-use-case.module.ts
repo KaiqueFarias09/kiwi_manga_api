@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { FavoritesModule } from 'src/services/favorites/favorites.module';
+import { FavoritesModule } from '../../services/favorites/favorites.module';
 import { FavoritesUseCase } from './favorites-use-case';
 
 @Module({

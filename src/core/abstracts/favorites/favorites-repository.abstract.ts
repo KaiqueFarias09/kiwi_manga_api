@@ -1,4 +1,4 @@
-import { CollectionManga, WasDeletedEntity } from 'src/core/entities';
+import { CollectionManga, WasDeletedEntity } from '../../entities';
 
 export abstract class IFavoritesRepository {
   abstract getFavorites(userId: string): Promise<CollectionManga[]>;

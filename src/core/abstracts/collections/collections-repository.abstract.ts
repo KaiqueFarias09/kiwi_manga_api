@@ -1,8 +1,4 @@
-import {
-  Collection,
-  CollectionManga,
-  WasDeletedEntity,
-} from 'src/core/entities';
+import { Collection, CollectionManga, WasDeletedEntity } from '../../entities';
 
 export abstract class ICollectionsRepository {
   abstract findCollections(userId: string): Promise<Collection[]>;

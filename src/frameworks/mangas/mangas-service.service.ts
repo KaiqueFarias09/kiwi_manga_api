@@ -1,15 +1,15 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
-import { AnyNode, Cheerio, CheerioAPI, load } from 'cheerio';
-import { IMangasRepository } from 'src/core/abstracts/mangas/mangas-repostitory.abstract';
-import { Chapter } from 'src/core/entities/chapters';
-import { MangaEntity, MangaSimplified } from 'src/core/entities/mangas';
-import { MongoService } from '../mongo-prisma/mongo-prisma.service';
-import { Manga, Prisma } from 'prisma/prisma/mongo-client';
 import axiosRetry from 'axios-retry';
+import { AnyNode, Cheerio, CheerioAPI, load } from 'cheerio';
+import { join } from 'path';
 import { ImageAnalyzer } from 'src/utils';
 import { readJsonFileAsync } from 'src/utils/read-json-file';
-import { join } from 'path';
+import { Manga, Prisma } from '../../../prisma/prisma/mongo-client';
+import { IMangasRepository } from '../..//core/abstracts/mangas/mangas-repostitory.abstract';
+import { Chapter } from '../../core/entities/chapters';
+import { MangaEntity, MangaSimplified } from '../../core/entities/mangas';
+import { MongoService } from '../mongo-prisma/mongo-prisma.service';
 
 axiosRetry(axios, { retries: 3 });
 @Injectable()

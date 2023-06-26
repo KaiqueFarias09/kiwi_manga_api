@@ -1,8 +1,8 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import * as pactum from 'pactum';
-import { PostgresService } from 'src/frameworks/postgres-prisma/postgres-prisma.service';
 import { AppModule } from '../src/app.module';
+import { PostgresService } from '../src/frameworks/postgres-prisma/postgres-prisma.service';
 
 describe('App e2e', () => {
   let app: INestApplication;

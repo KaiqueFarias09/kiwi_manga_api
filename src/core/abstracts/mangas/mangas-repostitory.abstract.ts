@@ -1,4 +1,4 @@
-import { MangaEntity, MangaSimplified } from 'src/core/entities/mangas';
+import { MangaEntity, MangaSimplified } from '../../entities/mangas';
 
 export abstract class IMangasRepository {
   abstract getManga(url: string): Promise<MangaEntity>;

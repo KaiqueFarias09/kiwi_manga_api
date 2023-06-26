@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IAuthStrategy } from 'src/core/abstracts';
+import { IAuthStrategy } from '../../core/abstracts';
 
 @Injectable()
 export class AuthStrategyUseCases {
