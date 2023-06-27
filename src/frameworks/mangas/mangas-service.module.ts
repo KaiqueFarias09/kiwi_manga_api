@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ImageAnalyzer } from 'src/utils/image-analyzer';
+import { ImageAnalyzer } from '../../utils/image-analyzer';
 import { IMangasRepository } from '../../core/abstracts';
 import { MongoService } from '../mongo-prisma/mongo-prisma.service';
 import { MangasServicesService } from './mangas-service.service';

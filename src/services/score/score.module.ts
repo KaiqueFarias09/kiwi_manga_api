@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ScoreServiceModule } from 'src/frameworks/score/score-service.module';
+import { ScoreServiceModule } from '../../frameworks/score/score-service.module';
 
 @Module({
   imports: [ScoreServiceModule],

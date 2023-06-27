@@ -1,7 +1,7 @@
 import { Inject, Injectable, NestMiddleware } from '@nestjs/common';
 import * as argon from 'argon2';
 import { NextFunction, Request, Response } from 'express';
-import { PostgresService } from 'src/frameworks/postgres-prisma/postgres-prisma.service';
+import { PostgresService } from '../frameworks/postgres-prisma/postgres-prisma.service';
 
 @Injectable()
 export class PasswordVerifierMiddleware implements NestMiddleware {

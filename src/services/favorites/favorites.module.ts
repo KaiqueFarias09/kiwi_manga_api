@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { FavoritesServiceModule } from 'src/frameworks/favorites/favorites-service.module';
+import { FavoritesServiceModule } from '../../frameworks/favorites/favorites-service.module';
 
 @Module({
   imports: [FavoritesServiceModule],

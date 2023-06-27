@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { MangasServicesModule } from 'src/frameworks/mangas/mangas-service.module';
+import { MangasServicesModule } from '../../frameworks/mangas/mangas-service.module';
 
 @Module({
   imports: [MangasServicesModule],

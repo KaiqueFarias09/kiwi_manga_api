@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Param, Patch } from '@nestjs/common';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { UsersUseCase } from 'src/use-cases/users';
+import { UsersUseCase } from '../use-cases/users';
 import {
   DeleteAccountDto,
   UpdateEmailDto,

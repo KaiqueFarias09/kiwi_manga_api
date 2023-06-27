@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ProfilePicServiceModule } from 'src/frameworks/profile-pic/profile-pic-service.module';
+import { ProfilePicServiceModule } from '../../frameworks/profile-pic/profile-pic-service.module';
 
 @Module({
   imports: [ProfilePicServiceModule],
