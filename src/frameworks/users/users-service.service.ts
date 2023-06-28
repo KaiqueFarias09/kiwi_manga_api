@@ -20,7 +20,7 @@ export class UsersServiceService implements IUsersRepositoryAbstract {
   }): Promise<SuccessEntity> {
     try {
       const hash = await argon.hash(newPassword);
-      this.postgresService.user.update({
+      await this.postgresService.user.update({
         where: {
           id: userId,
         },
