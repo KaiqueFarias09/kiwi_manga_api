@@ -160,7 +160,6 @@ export class MangasServicesService implements IMangasRepository {
     areValid: boolean[],
   ): Promise<void> {
     try {
-      console.log(mangasToAdd);
       const mangaPages = await axios.all(
         mangasToAdd.map((manga) => {
           return axios.get(manga.url, { timeout: 30000 });
@@ -207,8 +206,7 @@ export class MangasServicesService implements IMangasRepository {
         }
       });
 
-      const results = await Promise.all(promises);
-      console.log(results.forEach((result) => console.log(result)));
+      await Promise.all(promises);
     } catch (err) {
       if (err.code === 'ECONNABORTED') {
         this.logger.error(`A timeout happened on url ${err.config.url}`);

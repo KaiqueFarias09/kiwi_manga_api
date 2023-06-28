@@ -19,7 +19,7 @@ export class ProfilePicServiceService implements IProfilePicRepository {
         profilePicture: true,
       },
     });
-    console.log(user);
+
     return user.profilePicture;
   }
 

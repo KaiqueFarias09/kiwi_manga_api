@@ -11,16 +11,18 @@ export class PasswordVerifierMiddleware implements NestMiddleware {
   }
 
   async use(req: Request, res: Response, next: NextFunction) {
-    const { id, password } = req.body;
+    const { password } = req.body;
+    const userId = req.url.split('/')[1];
+
     const user = await this.postgresService.user.findUnique({
-      where: { id },
+      where: { id: userId },
     });
 
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const match = await argon.verify(password, user.password);
+    const match = await argon.verify(user.password, password);
     if (!match) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
