@@ -1,3 +1,5 @@
+.env*
+
 **/mongo-client
 **/postgres-client
 
