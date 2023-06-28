@@ -3,9 +3,12 @@ import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import helmet from 'helmet';
 import * as pactum from 'pactum';
-import { User } from '../prisma/prisma/postgres-client';
+import { Collection, User } from '../prisma/prisma/postgres-client';
 import { AppModule } from '../src/app.module';
 import {
+  AddMangaCollectionDto,
+  CollectionDto,
+  CollectionMangaDto,
   IncreaseScoreDto,
   SigninDto,
   SignupDto,
@@ -24,6 +27,15 @@ describe('App e2e', () => {
   const userEmail = 'vlad@gmail.com';
   const userPassword = '123';
   const userNickname = 'vlad';
+
+  const manga: CollectionMangaDto = {
+    id: '6480bb0edf1d440353f3fcdd',
+    name: 'Boshoku No Berserk (Berserk Of Gluttony)',
+    cover:
+      'https://img.novelcool.com/logo/202206/74/Boshoku_No_Berserk_Berserk_Of_Gluttony1942.jpg',
+    synopsis:
+      'Neste mundo, existem dois tipos de pessoas. Aqueles que têm poderosas "habilidades" e aqueles que não. As pessoas nascidas com habilidades poderosas exterminam monstros para subirem de nível e se tornarem bem-sucedidas, enquanto as pessoas sem eles, tornam-se fracassos, que são tratados com dureza pela sociedade. Fate é um cara que trabalha como um porteiro, e cuja única habilidade é a gula, uma habilidade que o faz comer almas.',
+  };
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -192,77 +204,135 @@ describe('App e2e', () => {
     });
   });
 
-  // describe('Favorites', () => {
-  //   let favoritesBasePath: string;
-  //   let manga: Manga;
+  describe('Favorites', () => {
+    let favoritesBasePath: string;
 
-  //   it('should get favorites', async () => {
-  //     user = await postgresService.user.findUnique({
-  //       where: {
-  //         email: userEmail,
-  //       },
-  //     });
-  //     manga = await postgresService.manga.findFirst();
-  //     favoritesBasePath = `/favorites/${user.id}`;
-  //     return pactum.spec().get(favoritesBasePath).expectStatus(200);
-  //   });
+    it('should add favorite', async () => {
+      user = await postgresService.user.findUnique({
+        where: {
+          email: userEmail,
+        },
+      });
+      favoritesBasePath = `/${user.id}/favorites`;
 
-  //   it('should add favorite', () => {
-  //     return pactum
-  //       .spec()
-  //       .post(favoritesBasePath)
-  //       .withBody({
-  //         mangaId: manga.id,
-  //       })
-  //       .expectStatus(201);
-  //   });
+      return pactum
+        .spec()
+        .post(favoritesBasePath)
+        .withBody(manga)
+        .expectStatus(201);
+    });
 
-  //   it('should delete favorite', () => {
-  //     return pactum
-  //       .spec()
-  //       .delete(favoritesBasePath)
-  //       .withBody({
-  //         mangaId: manga.id,
-  //       })
-  //       .expectStatus(200);
-  //   });
-  // });
+    it('should get favorites', async () => {
+      return pactum.spec().get(favoritesBasePath).expectStatus(200);
+    });
 
-  // describe('Collections', () => {
-  //   let collectionsBasePath: string;
-  //   let manga: Manga;
+    it('should delete favorite', () => {
+      return pactum
+        .spec()
+        .delete(favoritesBasePath)
+        .withBody(manga)
+        .expectStatus(200);
+    });
+  });
 
-  //   it('should get collections', async () => {
-  //     user = await postgresService.user.findUnique({
-  //       where: {
-  //         email: userEmail,
-  //       },
-  //     });
-  //     manga = await postgresService.manga.findFirst();
-  //     collectionsBasePath = `/collections/${user.id}`;
-  //     return pactum.spec().get(collectionsBasePath).expectStatus(200);
-  //   });
+  describe('Collections', () => {
+    let collectionsBasePath: string;
+    let collectionsMangasBasePath: string;
+    let collection: Collection;
+    const collectionDto: CollectionDto = {
+      name: 'Mangás de ação',
+      description: 'Uma coleção para mangás de ação',
+    };
 
-  //   it('should add collection', () => {
-  //     return pactum
-  //       .spec()
-  //       .post(collectionsBasePath)
-  //       .withBody({
-  //         mangaId: manga.id,
-  //       })
-  //       .expectStatus(201);
-  //   });
+    it('should add collection', async () => {
+      user = await postgresService.user.findUnique({
+        where: {
+          email: userEmail,
+        },
+      });
+      collectionsBasePath = `/${user.id}/collections`;
+      collectionsMangasBasePath = `${collectionsBasePath}/mangas`;
 
-  //   it('should delete collection', () => {
-  //     return pactum
-  //       .spec()
-  //       .delete(collectionsBasePath)
-  //       .withBody({
-  //         mangaId: manga.id,
-  //       })
-  //       .expectStatus(200);
-  //   });
-  // });
+      return pactum
+        .spec()
+        .post(collectionsBasePath)
+        .withBody(collectionDto)
+        .expectStatus(201);
+    });
+
+    it('should get collections', () => {
+      return pactum.spec().get(collectionsBasePath).expectStatus(200);
+    });
+
+    it('should update collection', async () => {
+      const dbCollections = await postgresService.collection.findMany({
+        where: {
+          userId: user.id,
+        },
+      });
+      collection = dbCollections[0];
+
+      return pactum
+        .spec()
+        .put(collectionsBasePath)
+        .withBody({
+          id: collection.id,
+          name: 'Mangás de ação',
+          description:
+            'Uma coleção para mangás de terror que também têm uma ação',
+        })
+        .expectStatus(200);
+    });
+
+    it('should add manga to collection', () => {
+      const addMangaToCollectionDto: AddMangaCollectionDto = {
+        collectionId: collection.id,
+        mangaId: '6480bb0edf1d440353f3fcdd',
+        mangaName: 'Boshoku No Berserk (Berserk Of Gluttony)',
+        mangaCover:
+          'https://img.novelcool.com/logo/202206/74/Boshoku_No_Berserk_Berserk_Of_Gluttony1942.jpg',
+        mangaSynopsis:
+          'Neste mundo, existem dois tipos de pessoas. Aqueles que têm poderosas "habilidades" e aqueles que não. As pessoas nascidas com habilidades poderosas exterminam monstros para subirem de nível e se tornarem bem-sucedidas, enquanto as pessoas sem eles, tornam-se fracassos, que são tratados com dureza pela sociedade. Fate é um cara que trabalha como um porteiro, e cuja única habilidade é a gula, uma habilidade que o faz comer almas.',
+      };
+
+      return pactum
+        .spec()
+        .post(collectionsMangasBasePath)
+        .withBody(addMangaToCollectionDto)
+        .expectStatus(201);
+    });
+
+    it('should get all mangas from collection', () => {
+      return pactum
+        .spec()
+        .get(collectionsMangasBasePath)
+        .withBody({
+          id: collection.id,
+        })
+        .expectStatus(200);
+    });
+
+    it('should delete manga from collection', () => {
+      return pactum
+        .spec()
+        .delete(collectionsMangasBasePath)
+        .withBody({
+          collectionId: collection.id,
+          mangaId: '6480bb0edf1d440353f3fcdd',
+        })
+        .expectStatus(200);
+    });
+
+    it('should delete collection', async () => {
+      return pactum
+        .spec()
+        .delete(collectionsBasePath)
+        .withBody({
+          id: collection.id,
+        })
+        .expectStatus(200);
+    });
+  });
 
   describe('Mangas', () => {
     const mangasBasePath = '/mangas';

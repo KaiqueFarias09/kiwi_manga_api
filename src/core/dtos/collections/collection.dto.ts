@@ -9,7 +9,7 @@ export class CollectionDto {
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  id: string;
+  id?: string;
 
   @ApiProperty({
     description: namePhrase,
