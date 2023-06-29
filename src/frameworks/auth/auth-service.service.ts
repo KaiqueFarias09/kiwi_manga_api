@@ -5,7 +5,7 @@ import { IAuthService } from '../../core/abstracts/';
 import { SigninDto, SignTokenDto, SignupDto } from '../../core/dtos';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
 import * as argon from 'argon2';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class AuthService implements IAuthService {
