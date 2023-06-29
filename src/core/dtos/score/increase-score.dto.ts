@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber } from 'class-validator';
+import { IsNumber, IsPositive } from 'class-validator';
 
 export class IncreaseScoreDto {
-  @IsNumber()
   @ApiProperty()
+  @IsNumber()
+  @IsPositive()
   increase: number;
 }

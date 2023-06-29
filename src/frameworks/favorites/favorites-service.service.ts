@@ -1,4 +1,9 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { IFavoritesRepository } from '../../core/abstracts';
 import { CollectionManga, WasDeletedEntity } from '../../core/entities';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
@@ -12,52 +17,78 @@ export class FavoritesServiceService implements IFavoritesRepository {
   }
 
   async getFavorites(userId: string): Promise<CollectionManga[]> {
-    const data = await this.postgresService.user.findUnique({
-      where: {
-        id: userId,
-      },
-      include: {
-        FavoriteManga: {
-          include: {
-            manga: true,
+    try {
+      const data = await this.postgresService.user.findUnique({
+        where: {
+          id: userId,
+        },
+        include: {
+          FavoriteManga: {
+            include: {
+              manga: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    return data.FavoriteManga.map((manga) => {
-      return manga.manga;
-    });
+      return data.FavoriteManga.map((manga) => {
+        return manga.manga;
+      });
+    } catch (error) {
+      if (
+        error.message ===
+        "Cannot read properties of null (reading 'FavoriteManga')"
+      ) {
+        throw new BadRequestException({
+          statusCode: 400,
+          message: 'User does not exist',
+        });
+      }
+    }
   }
 
   async addFavorite(
     manga: CollectionManga,
     userId: string,
   ): Promise<CollectionManga> {
-    await this.postgresService.favoriteManga.create({
-      data: {
-        user: {
-          connect: {
-            id: userId,
-          },
-        },
-        manga: {
-          connectOrCreate: {
-            where: {
-              id: manga.id,
-            },
-            create: {
-              name: manga.name,
-              cover: manga.cover,
-              synopsis: manga.synopsis,
-              id: manga.id,
+    try {
+      await this.postgresService.favoriteManga.create({
+        data: {
+          user: {
+            connect: {
+              id: userId,
             },
           },
+          manga: {
+            connectOrCreate: {
+              where: {
+                id: manga.id,
+              },
+              create: {
+                name: manga.name,
+                cover: manga.cover,
+                synopsis: manga.synopsis,
+                id: manga.id,
+              },
+            },
+          },
         },
-      },
-    });
+      });
 
-    return manga;
+      return manga;
+    } catch (error) {
+      if (error.code === 'P2025')
+        throw new BadRequestException({
+          message: 'User does not exist',
+          statusCode: 400,
+        });
+
+      if (error.code === 'P2002')
+        throw new BadRequestException({
+          message: 'Manga already exists in favorites',
+          statusCode: 400,
+        });
+    }
   }
 
   async removeFavorite(
@@ -76,11 +107,12 @@ export class FavoritesServiceService implements IFavoritesRepository {
       return {
         deleted: true,
       };
-    } catch (e) {
-      this.logger.error(e);
-      return {
-        deleted: false,
-      };
+    } catch (error) {
+      if (error.code === 'P2025')
+        throw new BadRequestException({
+          message: "Record to delete doesn't exist",
+          statusCode: 400,
+        });
     }
   }
 }

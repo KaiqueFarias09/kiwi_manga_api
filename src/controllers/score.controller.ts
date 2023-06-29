@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { ScoreUseCase } from '../use-cases/score';
 import { IncreaseScoreDto } from '../core/dtos';
+import { ScoreUseCase } from '../use-cases/score';
 
 @ApiTags('score')
 @ApiSecurity('Authorization')
@@ -23,9 +23,7 @@ export class ScoreController {
   }
 
   @Get(':id')
-  getPodiumAndUserScore(
-    @Param('id') userID: string,
-  ): Promise<{ podium: { name: string; score: number }[]; userScore: number }> {
+  getPodiumAndUserScore(@Param('id') userID: string) {
     return this.scoreService.getPodiumAndUserScore(userID);
   }
 

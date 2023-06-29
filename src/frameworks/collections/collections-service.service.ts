@@ -61,7 +61,6 @@ export class CollectionsServiceService implements ICollectionsRepository {
         deleted: true,
       };
     } catch (error) {
-      this.logger.error(error);
       return {
         deleted: false,
       };
@@ -164,7 +163,6 @@ export class CollectionsServiceService implements ICollectionsRepository {
 
       return { deleted: true };
     } catch (error) {
-      this.logger.error(error);
       return { deleted: false };
     }
   }

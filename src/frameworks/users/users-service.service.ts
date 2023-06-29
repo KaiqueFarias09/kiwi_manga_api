@@ -30,7 +30,6 @@ export class UsersServiceService implements IUsersRepositoryAbstract {
       });
       return { sucess: true };
     } catch (error) {
-      this.logger.error(error);
       return { sucess: false };
     }
   }
@@ -52,7 +51,6 @@ export class UsersServiceService implements IUsersRepositoryAbstract {
       });
       return { sucess: true };
     } catch (error) {
-      this.logger.error(error);
       return { sucess: false };
     }
   }
@@ -74,7 +72,6 @@ export class UsersServiceService implements IUsersRepositoryAbstract {
       });
       return { sucess: true };
     } catch (error) {
-      this.logger.error(error);
       return { sucess: false };
     }
   }
@@ -87,7 +84,6 @@ export class UsersServiceService implements IUsersRepositoryAbstract {
       });
       return { deleted: true };
     } catch (error) {
-      this.logger.error(error);
       return { deleted: false };
     }
   }

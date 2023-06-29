@@ -8,9 +8,11 @@ const testProperties = new TestProperties();
 
 let postgresService: PostgresService;
 let defaultTestUser: User;
+let favoritesBasePath: string;
 beforeAll(async () => {
   await testSetup.setup();
   ({ defaultTestUser, postgresService } = testSetup.getServices());
+  favoritesBasePath = `/${defaultTestUser.id}/favorites`;
 });
 
 afterAll(async () => {
@@ -23,11 +25,7 @@ afterAll(async () => {
 });
 
 describe('Favorites', () => {
-  let favoritesBasePath: string;
-
   it('should add favorite', async () => {
-    favoritesBasePath = `/${defaultTestUser.id}/favorites`;
-
     return pactum
       .spec()
       .post(favoritesBasePath)
@@ -45,5 +43,57 @@ describe('Favorites', () => {
       .delete(favoritesBasePath)
       .withBody(testProperties.manga)
       .expectStatus(200);
+  });
+});
+
+describe('Favorites Error Handling', () => {
+  const nonExistentUserBasePath = `/nonexistentuser/favorites`;
+
+  it('should not add favorite for non-existent user', async () => {
+    return pactum
+      .spec()
+      .post(nonExistentUserBasePath)
+      .withBody(testProperties.manga)
+      .expectStatus(400);
+  });
+
+  it('should not get favorites for non-existent user', async () => {
+    return pactum.spec().get(nonExistentUserBasePath).expectStatus(400);
+  });
+
+  it('should not delete favorite for non-existent user', () => {
+    return pactum
+      .spec()
+      .delete(nonExistentUserBasePath)
+      .withBody(testProperties.manga)
+      .expectStatus(400);
+  });
+
+  it('should not add duplicate favorite', async () => {
+    await pactum
+      .spec()
+      .post(favoritesBasePath)
+      .withBody(testProperties.manga)
+      .expectStatus(201);
+
+    return pactum
+      .spec()
+      .post(favoritesBasePath)
+      .withBody(testProperties.manga)
+      .expectStatus(400);
+  });
+
+  it('should not delete non-existent favorite', async () => {
+    await pactum
+      .spec()
+      .delete(favoritesBasePath)
+      .withBody(testProperties.manga)
+      .expectStatus(200);
+
+    return pactum
+      .spec()
+      .delete(favoritesBasePath)
+      .withBody(testProperties.manga)
+      .expectStatus(400);
   });
 });

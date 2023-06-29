@@ -6,10 +6,12 @@ import { TestProperties, TestSetup } from './utils';
 const testSetup = new TestSetup();
 const testProperties = new TestProperties();
 
+let scoreBasePath: string;
 let defaultTestUser: User;
 beforeAll(async () => {
   await testSetup.setup();
   ({ defaultTestUser } = testSetup.getServices());
+  scoreBasePath = `/score/${defaultTestUser.id}`;
 });
 
 afterAll(async () => {
@@ -17,10 +19,7 @@ afterAll(async () => {
 });
 
 describe('Score', () => {
-  let scoreBasePath: string;
-
   it('should get score', async () => {
-    scoreBasePath = `/score/${defaultTestUser.id}`;
     return pactum.spec().get(scoreBasePath).expectStatus(200);
   });
 
@@ -34,5 +33,37 @@ describe('Score', () => {
       .put(scoreBasePath)
       .withBody(updateScoreDto)
       .expectStatus(200);
+  });
+});
+
+describe('Score Error Handling', () => {
+  const nonExistentUserScoreBasePath = `/score/nonexistentuser`;
+
+  it('should not get score for non-existent user', async () => {
+    return pactum.spec().get(nonExistentUserScoreBasePath).expectStatus(404);
+  });
+
+  it('should not update score for non-existent user', () => {
+    const updateScoreDto: IncreaseScoreDto = {
+      increase: testProperties.increaseScoreValue,
+    };
+
+    return pactum
+      .spec()
+      .put(nonExistentUserScoreBasePath)
+      .withBody(updateScoreDto)
+      .expectStatus(400);
+  });
+
+  it('should not update score with invalid data', () => {
+    const invalidUpdateScoreDto: IncreaseScoreDto = {
+      increase: -1,
+    };
+
+    return pactum
+      .spec()
+      .put(scoreBasePath)
+      .withBody(invalidUpdateScoreDto)
+      .expectStatus(400);
   });
 });
