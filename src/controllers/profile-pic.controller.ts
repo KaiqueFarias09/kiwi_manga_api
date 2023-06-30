@@ -15,7 +15,7 @@ import { UpdateProfilePicDto } from '../core/dtos';
 @ApiTags('profile-pic')
 @ApiSecurity('Authorization')
 @UseGuards(AuthGuard('api-key'))
-@Controller('profile-pic')
+@Controller(':id/profile-pic')
 export class ProfilePicController {
   profilePicService: ProfilePicUseCase;
   constructor(
@@ -24,13 +24,13 @@ export class ProfilePicController {
     this.profilePicService = profilePicServiceUseCase;
   }
 
-  @Get(':id')
+  @Get()
   async findProfilePic(@Param('id') userID: string) {
     const profilePic = await this.profilePicService.findProfilePic(userID);
     return { profilePic: profilePic };
   }
 
-  @Put(':id')
+  @Put()
   async updateProfilePic(
     @Param('id') userID: string,
     @Body() { profilePic }: UpdateProfilePicDto,
