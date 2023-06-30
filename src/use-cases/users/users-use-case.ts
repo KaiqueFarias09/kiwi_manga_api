@@ -1,6 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IUsersRepositoryAbstract } from '../../core/abstracts';
-import { SuccessEntity, WasDeletedEntity } from '../../core/entities';
+import {
+  UpdateEmailResponseEntity,
+  UpdateNicknameResponseEntity,
+  UpdatePasswordResponseEntity,
+} from '../../core/entities';
 
 @Injectable()
 export class UsersUseCase {
@@ -16,7 +20,7 @@ export class UsersUseCase {
   }: {
     userId: string;
     newPassword: string;
-  }): Promise<SuccessEntity> {
+  }): Promise<UpdatePasswordResponseEntity> {
     return this.usersRepository.updatePassword({ userId, newPassword });
   }
   updateNickname({
@@ -25,7 +29,7 @@ export class UsersUseCase {
   }: {
     userId: string;
     newNickname: string;
-  }): Promise<SuccessEntity> {
+  }): Promise<UpdateNicknameResponseEntity> {
     return this.usersRepository.updateNickname({ userId, newNickname });
   }
   updateEmail({
@@ -34,10 +38,11 @@ export class UsersUseCase {
   }: {
     userId: string;
     newEmail: string;
-  }): Promise<SuccessEntity> {
+  }): Promise<UpdateEmailResponseEntity> {
     return this.usersRepository.updateEmail({ userId, newEmail });
   }
-  deleteAccount(userId: string): Promise<WasDeletedEntity> {
+
+  deleteAccount(userId: string): Promise<void> {
     return this.usersRepository.deleteAccount(userId);
   }
 }

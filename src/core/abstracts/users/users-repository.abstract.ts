@@ -1,4 +1,8 @@
-import { SuccessEntity, WasDeletedEntity } from '../../entities';
+import {
+  UpdateEmailResponseEntity,
+  UpdateNicknameResponseEntity,
+  UpdatePasswordResponseEntity,
+} from '../../entities';
 
 export abstract class IUsersRepositoryAbstract {
   abstract updatePassword({
@@ -7,7 +11,7 @@ export abstract class IUsersRepositoryAbstract {
   }: {
     userId: string;
     newPassword: string;
-  }): Promise<SuccessEntity>;
+  }): Promise<UpdatePasswordResponseEntity>;
 
   abstract updateNickname({
     userId,
@@ -15,7 +19,7 @@ export abstract class IUsersRepositoryAbstract {
   }: {
     userId: string;
     newNickname: string;
-  }): Promise<SuccessEntity>;
+  }): Promise<UpdateNicknameResponseEntity>;
 
   abstract updateEmail({
     userId,
@@ -23,7 +27,7 @@ export abstract class IUsersRepositoryAbstract {
   }: {
     userId: string;
     newEmail: string;
-  }): Promise<SuccessEntity>;
+  }): Promise<UpdateEmailResponseEntity>;
 
-  abstract deleteAccount(userId: string): Promise<WasDeletedEntity>;
+  abstract deleteAccount(userId: string): Promise<void>;
 }

@@ -1,12 +1,15 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as argon from 'argon2';
 import { IUsersRepositoryAbstract } from '../../core/abstracts';
-import { SuccessEntity, WasDeletedEntity } from '../../core/entities';
+import {
+  UpdateEmailResponseEntity,
+  UpdateNicknameResponseEntity,
+  UpdatePasswordResponseEntity,
+} from '../../core/entities';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
 
 @Injectable()
 export class UsersServiceService implements IUsersRepositoryAbstract {
-  private logger = new Logger('UsersServiceService');
   postgresService: PostgresService;
   constructor(postgresService: PostgresService) {
     this.postgresService = postgresService;
@@ -17,10 +20,10 @@ export class UsersServiceService implements IUsersRepositoryAbstract {
   }: {
     userId: string;
     newPassword: string;
-  }): Promise<SuccessEntity> {
+  }): Promise<UpdatePasswordResponseEntity> {
     try {
       const hash = await argon.hash(newPassword);
-      await this.postgresService.user.update({
+      const user = await this.postgresService.user.update({
         where: {
           id: userId,
         },
@@ -28,9 +31,9 @@ export class UsersServiceService implements IUsersRepositoryAbstract {
           password: hash,
         },
       });
-      return { sucess: true };
+      return { nickname: user.nickname, userId: user.id };
     } catch (error) {
-      return { sucess: false };
+      throw error;
     }
   }
   async updateNickname({
@@ -39,9 +42,9 @@ export class UsersServiceService implements IUsersRepositoryAbstract {
   }: {
     userId: string;
     newNickname: string;
-  }): Promise<SuccessEntity> {
+  }): Promise<UpdateNicknameResponseEntity> {
     try {
-      await this.postgresService.user.update({
+      const user = await this.postgresService.user.update({
         where: {
           id: userId,
         },
@@ -49,9 +52,13 @@ export class UsersServiceService implements IUsersRepositoryAbstract {
           nickname: newNickname,
         },
       });
-      return { sucess: true };
+
+      return {
+        newNickname: user.nickname,
+        userId: user.id,
+      };
     } catch (error) {
-      return { sucess: false };
+      throw error;
     }
   }
   async updateEmail({
@@ -60,9 +67,9 @@ export class UsersServiceService implements IUsersRepositoryAbstract {
   }: {
     userId: string;
     newEmail: string;
-  }): Promise<SuccessEntity> {
+  }): Promise<UpdateEmailResponseEntity> {
     try {
-      await this.postgresService.user.update({
+      const user = await this.postgresService.user.update({
         where: {
           id: userId,
         },
@@ -70,21 +77,23 @@ export class UsersServiceService implements IUsersRepositoryAbstract {
           email: newEmail,
         },
       });
-      return { sucess: true };
+      return {
+        newEmail: user.email,
+        userId: user.id,
+      };
     } catch (error) {
-      return { sucess: false };
+      throw error;
     }
   }
-  async deleteAccount(userId: string): Promise<WasDeletedEntity> {
+  async deleteAccount(userId: string): Promise<void> {
     try {
       await this.postgresService.user.delete({
         where: {
           id: userId,
         },
       });
-      return { deleted: true };
     } catch (error) {
-      return { deleted: false };
+      throw error;
     }
   }
 }

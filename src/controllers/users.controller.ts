@@ -1,12 +1,19 @@
 import { Body, Controller, Delete, Param, Patch } from '@nestjs/common';
-import { ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { UsersUseCase } from '../use-cases/users';
+import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import {
   DeleteAccountDto,
   UpdateEmailDto,
   UpdateNicknameDto,
   UpdatePasswordDto,
 } from '../core/dtos';
+import { HttpResponseStatus } from '../core/enums';
+import {
+  DeleteAccountHttpResponse,
+  UpdateEmailHttpResponse,
+  UpdateNicknameHttpResponse,
+  UpdatePasswordHttpResponse,
+} from '../core/responses';
+import { UsersUseCase } from '../use-cases/users';
 
 @ApiTags('users')
 @ApiSecurity('Authorization')
@@ -17,44 +24,80 @@ export class UsersController {
     this.userService = userService;
   }
 
+  @ApiResponse({ status: 200, type: UpdatePasswordHttpResponse })
   @Patch('password')
-  updatePassword(
+  async updatePassword(
     @Param('userId') userId: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
-  ) {
-    return this.userService.updatePassword({
+  ): Promise<UpdatePasswordHttpResponse> {
+    const data = await this.userService.updatePassword({
       newPassword: updatePasswordDto.newPassword,
       userId,
     });
+    return {
+      status: HttpResponseStatus.SUCCESS,
+      data: {
+        user: {
+          id: data.userId,
+          nickname: data.nickname,
+        },
+      },
+    };
   }
 
+  @ApiResponse({ status: 200, type: UpdateNicknameHttpResponse })
   @Patch('nickname')
-  updateNickname(
+  async updateNickname(
     @Param('userId') userId: string,
     @Body() updateNicknameDto: UpdateNicknameDto,
-  ) {
-    return this.userService.updateNickname({
+  ): Promise<UpdateNicknameHttpResponse> {
+    const data = await this.userService.updateNickname({
       newNickname: updateNicknameDto.newNickname,
       userId,
     });
+
+    return {
+      status: HttpResponseStatus.SUCCESS,
+      data: {
+        user: {
+          id: data.userId,
+          newNickname: data.newNickname,
+        },
+      },
+    };
   }
 
+  @ApiResponse({ status: 200, type: UpdateEmailHttpResponse })
   @Patch('email')
-  updateEmail(
+  async updateEmail(
     @Param('userId') userId: string,
     @Body() updateEmailDto: UpdateEmailDto,
-  ) {
-    return this.userService.updateEmail({
+  ): Promise<UpdateEmailHttpResponse> {
+    const data = await this.userService.updateEmail({
       newEmail: updateEmailDto.newEmail,
       userId,
     });
+    return {
+      status: HttpResponseStatus.SUCCESS,
+      data: {
+        user: {
+          id: data.userId,
+          newEmail: data.newEmail,
+        },
+      },
+    };
   }
 
+  @ApiResponse({ status: 200, type: DeleteAccountHttpResponse })
   @Delete()
-  deleteAccount(
+  async deleteAccount(
     @Param('userId') userId: string,
     @Body() deleteAccountDto: DeleteAccountDto,
-  ) {
-    return this.userService.deleteAccount(userId);
+  ): Promise<DeleteAccountHttpResponse> {
+    await this.userService.deleteAccount(userId);
+    return {
+      message: 'Account deleted successfully',
+      status: HttpResponseStatus.SUCCESS,
+    };
   }
 }
