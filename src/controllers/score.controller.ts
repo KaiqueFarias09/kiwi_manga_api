@@ -39,6 +39,7 @@ export class ScoreController {
     };
   }
 
+  @ApiResponse({ status: 200, type: IncreaseScoreHttpResponse })
   @Put(':id')
   async increaseScore(
     @Param('id') userID: string,

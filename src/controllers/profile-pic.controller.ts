@@ -8,9 +8,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { ProfilePicUseCase } from '../use-cases/profile-pic';
+import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { UpdateProfilePicDto } from '../core/dtos';
+import { HttpResponseStatus } from '../core/enums';
+import {
+  FindProfilePicHttpResponse,
+  UpdateProfilePicHttpResponse,
+} from '../core/responses';
+import { ProfilePicUseCase } from '../use-cases/profile-pic';
 
 @ApiTags('profile-pic')
 @ApiSecurity('Authorization')
@@ -24,24 +29,34 @@ export class ProfilePicController {
     this.profilePicService = profilePicServiceUseCase;
   }
 
+  @ApiResponse({ status: 200, type: FindProfilePicHttpResponse })
   @Get()
-  async findProfilePic(@Param('id') userID: string) {
+  async findProfilePic(
+    @Param('id') userID: string,
+  ): Promise<FindProfilePicHttpResponse> {
     const profilePic = await this.profilePicService.findProfilePic(userID);
-    return { profilePic: profilePic };
+    return {
+      status: HttpResponseStatus.SUCCESS,
+      data: {
+        profilePic: profilePic,
+      },
+    };
   }
 
+  @ApiResponse({ status: 200, type: UpdateProfilePicHttpResponse })
   @Put()
   async updateProfilePic(
     @Param('id') userID: string,
     @Body() { profilePic }: UpdateProfilePicDto,
-  ) {
+  ): Promise<UpdateProfilePicHttpResponse> {
     const updatedProfilePic = await this.profilePicService.updateProfilePic({
       profilePic,
       userId: userID,
     });
 
     return {
-      profilePic: updatedProfilePic,
+      status: HttpResponseStatus.SUCCESS,
+      data: { profilePic: updatedProfilePic },
     };
   }
 }
