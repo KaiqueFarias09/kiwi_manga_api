@@ -17,7 +17,7 @@ export class CollectionsUseCase {
     userId: string,
     collectionInfo: Collection,
   ): Promise<Collection> {
-    return this.collectionsRepository.saveCollection(userId, collectionInfo);
+    return this.collectionsRepository.addCollection(userId, collectionInfo);
   }
   deleteCollection(collectionId: string): Promise<WasDeletedEntity> {
     return this.collectionsRepository.deleteCollection(collectionId);
@@ -26,7 +26,7 @@ export class CollectionsUseCase {
     return this.collectionsRepository.updateCollection(updatedCollectionInfo);
   }
   findCollectionMangas(collectionId: string): Promise<CollectionManga[]> {
-    return this.collectionsRepository.findCollectionMangas(collectionId);
+    return this.collectionsRepository.findMangasFromCollection(collectionId);
   }
   addMangaToCollection(
     collectionId: string,

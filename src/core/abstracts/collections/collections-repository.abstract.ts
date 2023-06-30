@@ -2,7 +2,7 @@ import { Collection, CollectionManga, WasDeletedEntity } from '../../entities';
 
 export abstract class ICollectionsRepository {
   abstract findCollections(userId: string): Promise<Collection[]>;
-  abstract saveCollection(
+  abstract addCollection(
     userId: string,
     collectionInfo: Collection,
   ): Promise<Collection>;
@@ -11,7 +11,7 @@ export abstract class ICollectionsRepository {
     updatedCollectionInfo: Collection,
   ): Promise<Collection>;
 
-  abstract findCollectionMangas(
+  abstract findMangasFromCollection(
     collectionId: string,
   ): Promise<CollectionManga[]>;
   abstract addMangaToCollection(
