@@ -1,10 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ICollectionsRepository } from '../../core/abstracts';
-import {
-  Collection,
-  CollectionManga,
-  WasDeletedEntity,
-} from '../../core/entities';
+import { Collection, CollectionManga } from '../../core/entities';
 import {
   DependentResourceNotFoundException,
   ResourceDoesNotExistException,
@@ -58,17 +54,13 @@ export class CollectionsServiceService implements ICollectionsRepository {
     }
   }
 
-  async deleteCollection(collectionId: string): Promise<WasDeletedEntity> {
+  async deleteCollection(collectionId: string): Promise<void> {
     try {
       await this.postgresService.collection.delete({
         where: {
           id: collectionId,
         },
       });
-
-      return {
-        deleted: true,
-      };
     } catch (error) {
       if (error.code == 'P2025') throw new ResourceDoesNotExistException();
       throw error;
@@ -167,7 +159,7 @@ export class CollectionsServiceService implements ICollectionsRepository {
   async deleteMangaFromCollection(
     collectionId: string,
     mangaId: string,
-  ): Promise<WasDeletedEntity> {
+  ): Promise<void> {
     try {
       await this.postgresService.collection.update({
         where: {
@@ -184,8 +176,6 @@ export class CollectionsServiceService implements ICollectionsRepository {
           },
         },
       });
-
-      return { deleted: true };
     } catch (error) {
       if (error.code == 'P2017') throw new ResourceDoesNotExistException();
       throw error;

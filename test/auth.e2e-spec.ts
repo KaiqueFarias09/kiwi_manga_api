@@ -93,7 +93,7 @@ describe('Auth', () => {
         .post('/auth/signin')
         .withBody(signinDto)
         .expectStatus(200)
-        .stores('userAt', 'access_token');
+        .stores('userAt', 'accessToken');
     });
   });
 });

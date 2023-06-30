@@ -8,8 +8,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { HttpResponseStatus } from '../core/enums';
 import { IncreaseScoreDto } from '../core/dtos';
+import {
+  GetPodiumHttpResponse,
+  IncreaseScoreHttpResponse,
+} from '../core/responses';
 import { ScoreUseCase } from '../use-cases/score';
 
 @ApiTags('score')
@@ -22,16 +27,29 @@ export class ScoreController {
     this.scoreService = scoreUseCaseService;
   }
 
+  @ApiResponse({ status: 200, type: GetPodiumHttpResponse })
   @Get(':id')
-  getPodiumAndUserScore(@Param('id') userID: string) {
-    return this.scoreService.getPodiumAndUserScore(userID);
+  async getPodiumAndUserScore(
+    @Param('id') userID: string,
+  ): Promise<GetPodiumHttpResponse> {
+    const data = await this.scoreService.getPodiumAndUserScore(userID);
+    return {
+      status: HttpResponseStatus.SUCCESS,
+      data,
+    };
   }
 
   @Put(':id')
-  increaseScore(
+  async increaseScore(
     @Param('id') userID: string,
     @Body() { increase }: IncreaseScoreDto,
-  ): Promise<{ score: number }> {
-    return this.scoreService.increaseScore(userID, increase);
+  ): Promise<IncreaseScoreHttpResponse> {
+    const data = await this.scoreService.increaseScore(userID, increase);
+    return {
+      status: HttpResponseStatus.SUCCESS,
+      data: {
+        score: data,
+      },
+    };
   }
 }

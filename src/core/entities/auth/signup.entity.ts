@@ -1,4 +1,4 @@
-export class SignupDto {
+export class SignupEntity {
   email: string;
   password: string;
   name: string;

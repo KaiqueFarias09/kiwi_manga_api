@@ -1,4 +1,5 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { PodiumEntity } from '../../core/entities';
 import { IScoreRepository } from '../../core/abstracts';
 import { ResourceDoesNotExistException } from '../../core/errors/resource-does-not-exist.error';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
@@ -10,10 +11,7 @@ export class ScoreServiceService implements IScoreRepository {
     this.postgresService = postgresService;
   }
 
-  async increaseScore(
-    userId: string,
-    increase?: number,
-  ): Promise<{ score: number }> {
+  async increaseScore(userId: string, increase?: number): Promise<number> {
     try {
       const score = await this.postgresService.user.update({
         where: {
@@ -27,16 +25,13 @@ export class ScoreServiceService implements IScoreRepository {
       });
 
       if (!score) throw new ResourceDoesNotExistException();
-      return { score: score.score };
+      return score.score;
     } catch (error) {
       if (error.code === 'P2025') throw new ResourceDoesNotExistException();
     }
   }
 
-  async getPodiumAndUserScore(userId: string): Promise<{
-    podium: { name: string; score: number }[];
-    userScore: number;
-  }> {
+  async getPodiumAndUserScore(userId: string): Promise<PodiumEntity> {
     try {
       const [topUsers, user] = await Promise.all([
         this.postgresService.user.groupBy({

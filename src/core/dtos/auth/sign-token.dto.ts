@@ -3,8 +3,8 @@ import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 export class SignTokenDto {
   @IsString()
   @IsNotEmpty()
-  user_id: string;
+  userId: string;
 
   @IsEmail()
-  user_email: string;
+  userEmail: string;
 }

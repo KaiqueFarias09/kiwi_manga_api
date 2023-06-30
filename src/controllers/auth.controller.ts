@@ -8,9 +8,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { AuthServiceUseCases } from '../use-cases/auth/auth-service-use-cases';
+import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { SigninDto, SignupDto } from '../core/dtos';
+import { HttpResponseStatus } from '../core/enums';
+import { SigninHttpResponse, SignupHttpResponse } from '../core/responses';
+import { AuthServiceUseCases } from '../use-cases/auth/auth-service-use-cases';
 
 @ApiTags('auth')
 @ApiSecurity('Authorization')
@@ -24,14 +26,31 @@ export class AuthController {
     this.authService = authServiceUseCases;
   }
 
+  @ApiResponse({
+    status: 201,
+    type: SignupHttpResponse,
+  })
   @Post('signup')
-  signup(@Body() signupDto: SignupDto) {
-    return this.authService.signup(signupDto);
+  async signup(@Body() signupDto: SignupDto): Promise<SignupHttpResponse> {
+    const data = await this.authService.signup(signupDto);
+    return {
+      status: HttpResponseStatus.SUCCESS,
+      data: {
+        access_token: data.accessToken,
+      },
+    };
   }
 
+  @ApiResponse({ status: 200, type: SigninHttpResponse })
   @HttpCode(HttpStatus.OK)
   @Post('signin')
-  signin(@Body() signinDto: SigninDto) {
-    return this.authService.signin(signinDto);
+  async signin(@Body() signinDto: SigninDto): Promise<SigninHttpResponse> {
+    const data = await this.authService.signin(signinDto);
+    return {
+      status: HttpResponseStatus.SUCCESS,
+      data: {
+        accessToken: data.accessToken,
+      },
+    };
   }
 }

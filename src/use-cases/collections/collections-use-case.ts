@@ -1,10 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ICollectionsRepository } from '../../core/abstracts';
-import {
-  Collection,
-  CollectionManga,
-  WasDeletedEntity,
-} from '../../core/entities';
+import { Collection, CollectionManga } from '../../core/entities';
 
 @Injectable()
 export class CollectionsUseCase {
@@ -19,8 +15,8 @@ export class CollectionsUseCase {
   ): Promise<Collection> {
     return this.collectionsRepository.addCollection(userId, collectionInfo);
   }
-  deleteCollection(collectionId: string): Promise<WasDeletedEntity> {
-    return this.collectionsRepository.deleteCollection(collectionId);
+  async deleteCollection(collectionId: string): Promise<void> {
+    await this.collectionsRepository.deleteCollection(collectionId);
   }
   updateCollection(updatedCollectionInfo: Collection): Promise<Collection> {
     return this.collectionsRepository.updateCollection(updatedCollectionInfo);
@@ -38,8 +34,8 @@ export class CollectionsUseCase {
   async deleteMangaFromCollection(
     collectionId: string,
     mangaId: string,
-  ): Promise<WasDeletedEntity> {
-    return this.collectionsRepository.deleteMangaFromCollection(
+  ): Promise<void> {
+    await this.collectionsRepository.deleteMangaFromCollection(
       collectionId,
       mangaId,
     );
