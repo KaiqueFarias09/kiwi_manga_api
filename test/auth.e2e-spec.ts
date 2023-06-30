@@ -97,3 +97,47 @@ describe('Auth', () => {
     });
   });
 });
+
+describe('Auth Error Handling', () => {
+  const existingUserSignupDto: SignupDto = {
+    email: testProperties.email,
+    password: testProperties.password,
+    nickname: testProperties.nickname,
+  };
+  const incorrectPasswordSigninDto: SigninDto = {
+    email: testProperties.email,
+    password: 'incorrectPassword',
+  };
+  const nonExistentUserSigninDto: SigninDto = {
+    email: 'nonexistentuser@example.com',
+    password: testProperties.password,
+  };
+
+  describe('Signup', () => {
+    it("should not sign up with an email that's already in use", () => {
+      return pactum
+        .spec()
+        .post('/auth/signup')
+        .withBody(existingUserSignupDto)
+        .expectStatus(409);
+    });
+  });
+
+  describe('Signin', () => {
+    it('should not sign in with an incorrect password', () => {
+      return pactum
+        .spec()
+        .post('/auth/signin')
+        .withBody(incorrectPasswordSigninDto)
+        .expectStatus(401);
+    });
+
+    it("should not sign in with an email that doesn't exist", () => {
+      return pactum
+        .spec()
+        .post('/auth/signin')
+        .withBody(nonExistentUserSigninDto)
+        .expectStatus(401);
+    });
+  });
+});

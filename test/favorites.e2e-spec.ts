@@ -54,11 +54,11 @@ describe('Favorites Error Handling', () => {
       .spec()
       .post(nonExistentUserBasePath)
       .withBody(testProperties.manga)
-      .expectStatus(400);
+      .expectStatus(404);
   });
 
   it('should not get favorites for non-existent user', async () => {
-    return pactum.spec().get(nonExistentUserBasePath).expectStatus(400);
+    return pactum.spec().get(nonExistentUserBasePath).expectStatus(404);
   });
 
   it('should not delete favorite for non-existent user', () => {

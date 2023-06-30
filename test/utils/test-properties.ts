@@ -1,4 +1,4 @@
-import { AddMangaCollectionDto } from 'src/core/dtos';
+import { AddMangaCollectionDto } from '../../src/core/dtos';
 import { CollectionManga } from '../../src/core/entities';
 
 export class TestProperties {
@@ -12,6 +12,10 @@ export class TestProperties {
     email: 'defaulttestuser@test.com',
     nickname: 'defaultTestUser',
     password: 'testPassword',
+  };
+  defaultCollection = {
+    name: 'Mangás de ação',
+    description: 'Uma coleção para mangás de ação',
   };
   manga: CollectionManga = {
     id: '6480bb0edf1d440353f3fcdd',

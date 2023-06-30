@@ -52,7 +52,7 @@ describe('Score Error Handling', () => {
       .spec()
       .put(nonExistentUserScoreBasePath)
       .withBody(updateScoreDto)
-      .expectStatus(400);
+      .expectStatus(404);
   });
 
   it('should not update score with invalid data', () => {

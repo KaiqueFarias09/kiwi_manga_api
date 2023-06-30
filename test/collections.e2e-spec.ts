@@ -1,6 +1,5 @@
 import * as pactum from 'pactum';
 import { Collection, User } from '../prisma/prisma/postgres-client';
-import { CollectionDto } from '../src/core/dtos';
 import { PostgresService } from '../src/frameworks/postgres-prisma/postgres-prisma.service';
 import { TestProperties, TestSetup } from './utils';
 
@@ -23,11 +22,6 @@ describe('Collections', () => {
   let collectionsMangasBasePath: string;
   let collection: Collection;
 
-  const collectionDto: CollectionDto = {
-    name: 'Mangás de ação',
-    description: 'Uma coleção para mangás de ação',
-  };
-
   it('should add collection', async () => {
     collectionsBasePath = `/${defaultTestUser.id}/collections`;
     collectionsMangasBasePath = `${collectionsBasePath}/mangas`;
@@ -35,7 +29,7 @@ describe('Collections', () => {
     return pactum
       .spec()
       .post(collectionsBasePath)
-      .withBody(collectionDto)
+      .withBody(testProperties.defaultCollection)
       .expectStatus(201);
   });
 
@@ -102,5 +96,70 @@ describe('Collections', () => {
         id: collection.id,
       })
       .expectStatus(200);
+  });
+});
+
+describe('Collections Error Handling', () => {
+  const nonExistentUserCollectionsBasePath = `/nonexistentuser/collections`;
+  const nonExistentUserCollectionsMangasBasePath = `${nonExistentUserCollectionsBasePath}/mangas`;
+
+  it('should not add collection for non-existent user', async () => {
+    return pactum
+      .spec()
+      .post(nonExistentUserCollectionsBasePath)
+      .withBody(testProperties.defaultCollection)
+      .expectStatus(404);
+  });
+
+  it('should not update non-existent collection', async () => {
+    return pactum
+      .spec()
+      .put(nonExistentUserCollectionsBasePath)
+      .withBody({
+        id: 'nonexistentcollection',
+        name: 'Mangás de ação',
+        description:
+          'Uma coleção para mangás de terror que também têm uma ação',
+      })
+      .expectStatus(404);
+  });
+
+  it('should not add manga to non-existent collection', () => {
+    return pactum
+      .spec()
+      .post(nonExistentUserCollectionsMangasBasePath)
+      .withBody(testProperties.addMangaToCollectionDto)
+      .expectStatus(404);
+  });
+
+  it('should not get all mangas from non-existent collection', () => {
+    return pactum
+      .spec()
+      .get(nonExistentUserCollectionsMangasBasePath)
+      .withBody({
+        id: 'nonexistentcollection',
+      })
+      .expectStatus(404);
+  });
+
+  it('should not delete manga from non-existent collection', () => {
+    return pactum
+      .spec()
+      .delete(nonExistentUserCollectionsMangasBasePath)
+      .withBody({
+        collectionId: 'nonexistentcollection',
+        mangaId: '6480bb0edf1d440353f3fcdd',
+      })
+      .expectStatus(404);
+  });
+
+  it('should not delete non-existent collection', async () => {
+    return pactum
+      .spec()
+      .delete(nonExistentUserCollectionsBasePath)
+      .withBody({
+        id: 'nonexistentcollection',
+      })
+      .expectStatus(404);
   });
 });

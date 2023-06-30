@@ -1,11 +1,12 @@
 import * as pactum from 'pactum';
-import { MongoService } from 'src/frameworks/mongo-prisma/mongo-prisma.service';
+import { MongoService } from '../src/frameworks/mongo-prisma/mongo-prisma.service';
 import { TestSetup } from './utils';
 
 pactum.request.setDefaultTimeout(15000);
 const testSetup = new TestSetup();
 
 let mongoService: MongoService;
+const mangasBasePath = '/mangas';
 beforeAll(async () => {
   await testSetup.setup();
   ({ mongoService } = testSetup.getServices());
@@ -16,10 +17,9 @@ afterAll(async () => {
 });
 
 describe('Mangas', () => {
-  const mangasBasePath = '/mangas';
   describe('Random', () => {
     it('should get random manga', () => {
-      return pactum.spec().get(`${mangasBasePath}/random}`).expectStatus(200);
+      return pactum.spec().get(`${mangasBasePath}/random`).expectStatus(200);
     });
   });
 
@@ -48,5 +48,23 @@ describe('Mangas', () => {
       });
       return pactum.spec().get(`/mangas/${randomManga.id}`).expectStatus(200);
     });
+  });
+});
+
+describe('Mangas Error Handling', () => {
+  const nonExistentMangaDetailsPath = `/mangas/nonexistentmanga`;
+
+  it('should not get manga list with invalid keyword', () => {
+    return pactum
+      .spec()
+      .get(mangasBasePath)
+      .withQueryParams({
+        keywords: 'invalidkeyword',
+      })
+      .expectStatus(404);
+  });
+
+  it('should not get details for non-existent manga', () => {
+    return pactum.spec().get(nonExistentMangaDetailsPath).expectStatus(404);
   });
 });
