@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { IFavoritesRepository } from '../../core/abstracts';
 import { CollectionManga, WasDeletedEntity } from '../../core/entities';
+import { ResourceDoesNotExistException } from '../../core/errors/resource-does-not-exist.error';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
 
 @Injectable()
@@ -39,10 +40,7 @@ export class FavoritesServiceService implements IFavoritesRepository {
         error.message ===
         "Cannot read properties of null (reading 'FavoriteManga')"
       ) {
-        throw new BadRequestException({
-          statusCode: 400,
-          message: 'User does not exist',
-        });
+        throw new ResourceDoesNotExistException();
       }
     }
   }
@@ -77,11 +75,7 @@ export class FavoritesServiceService implements IFavoritesRepository {
 
       return manga;
     } catch (error) {
-      if (error.code === 'P2025')
-        throw new BadRequestException({
-          message: 'User does not exist',
-          statusCode: 400,
-        });
+      if (error.code === 'P2025') throw new ResourceDoesNotExistException();
 
       if (error.code === 'P2002')
         throw new BadRequestException({

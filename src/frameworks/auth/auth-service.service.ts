@@ -1,11 +1,11 @@
-import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IAuthService } from '../../core/abstracts/';
-import { SigninDto, SignTokenDto, SignupDto } from '../../core/dtos';
-import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
+import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { IAuthService } from '../../core/abstracts/';
+import { SignTokenDto, SigninDto, SignupDto } from '../../core/dtos';
+import { ResourceAlreadyExistException } from '../../core/errors/';
+import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -35,10 +35,8 @@ export class AuthService implements IAuthService {
       });
       return this.signToken({ user_id: user.id, user_email: user.email });
     } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw new ForbiddenException('Credentials taken');
-        }
+      if (error.code === 'P2002') {
+        throw new ResourceAlreadyExistException();
       }
       throw error;
     }
@@ -50,9 +48,9 @@ export class AuthService implements IAuthService {
         email: signinDto.email,
       },
     });
-    if (!user) throw new ForbiddenException('Credentials incorrect');
+    if (!user) throw new UnauthorizedException('Credentials incorrect');
     const pwMatches = await argon.verify(user.password, signinDto.password);
-    if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
+    if (!pwMatches) throw new UnauthorizedException('Credentials incorrect');
     return this.signToken({ user_id: user.id, user_email: user.email });
   }
 

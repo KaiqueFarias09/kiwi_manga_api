@@ -1,10 +1,6 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { IScoreRepository } from '../../core/abstracts';
+import { ResourceDoesNotExistException } from '../../core/errors/resource-does-not-exist.error';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
 
 @Injectable()
@@ -30,14 +26,10 @@ export class ScoreServiceService implements IScoreRepository {
         },
       });
 
-      if (!score) throw new BadRequestException('User does not exist');
+      if (!score) throw new ResourceDoesNotExistException();
       return { score: score.score };
     } catch (error) {
-      if (error.code === 'P2025')
-        throw new BadRequestException({
-          message: 'User does not exist',
-          statusCode: 400,
-        });
+      if (error.code === 'P2025') throw new ResourceDoesNotExistException();
     }
   }
 
@@ -60,11 +52,7 @@ export class ScoreServiceService implements IScoreRepository {
         this.postgresService.user.findUnique({ where: { id: userId } }),
       ]);
 
-      if (!user)
-        throw new NotFoundException({
-          message: 'User does not exist',
-          statusCode: 404,
-        });
+      if (!user) throw new ResourceDoesNotExistException();
 
       return {
         userScore: user.score,
@@ -76,11 +64,7 @@ export class ScoreServiceService implements IScoreRepository {
         }),
       };
     } catch (error) {
-      if (error.status === 404)
-        throw new NotFoundException({
-          message: error.message,
-          statusCode: error.status,
-        });
+      if (error.status === 404) throw new ResourceDoesNotExistException();
 
       throw new BadRequestException({
         message: error.message,

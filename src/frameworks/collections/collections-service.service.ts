@@ -5,6 +5,10 @@ import {
   CollectionManga,
   WasDeletedEntity,
 } from '../../core/entities';
+import {
+  DependentResourceNotFoundException,
+  ResourceDoesNotExistException,
+} from '../../core/errors';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
 
 @Injectable()
@@ -30,23 +34,28 @@ export class CollectionsServiceService implements ICollectionsRepository {
     return collections;
   }
 
-  async saveCollection(
+  async addCollection(
     userId: string,
     collectionInfo: Collection,
   ): Promise<Collection> {
-    const newCollection = await this.postgresService.collection.create({
-      data: {
-        name: collectionInfo.name,
-        description: collectionInfo.description,
-        user: {
-          connect: {
-            id: userId,
+    try {
+      const newCollection = await this.postgresService.collection.create({
+        data: {
+          name: collectionInfo.name,
+          description: collectionInfo.description,
+          user: {
+            connect: {
+              id: userId,
+            },
           },
         },
-      },
-    });
+      });
 
-    return newCollection;
+      return newCollection;
+    } catch (error) {
+      if (error.code === 'P2025')
+        throw new DependentResourceNotFoundException();
+    }
   }
 
   async deleteCollection(collectionId: string): Promise<WasDeletedEntity> {
@@ -61,9 +70,8 @@ export class CollectionsServiceService implements ICollectionsRepository {
         deleted: true,
       };
     } catch (error) {
-      return {
-        deleted: false,
-      };
+      if (error.code == 'P2025') throw new ResourceDoesNotExistException();
+      throw error;
     }
   }
 
@@ -72,72 +80,88 @@ export class CollectionsServiceService implements ICollectionsRepository {
     description,
     name,
   }: Collection): Promise<Collection> {
-    const updatedCollection = await this.postgresService.collection.update({
-      where: {
-        id: id,
-      },
-      data: {
-        description: description,
-        name: name,
-      },
-    });
-
-    return updatedCollection;
-  }
-
-  async findCollectionMangas(collectionId: string): Promise<CollectionManga[]> {
-    const collectionWithMangas =
-      await this.postgresService.collection.findUnique({
+    try {
+      const updatedCollection = await this.postgresService.collection.update({
         where: {
-          id: collectionId,
+          id: id,
         },
-        include: {
-          MangaCollection: {
-            include: {
-              manga: true,
-            },
-          },
+        data: {
+          description: description,
+          name: name,
         },
       });
 
-    const mangas: CollectionManga[] = collectionWithMangas.MangaCollection.map(
-      (manga) => manga.manga,
-    );
-    return mangas;
+      return updatedCollection;
+    } catch (error) {
+      if (error.code == 'P2025') throw new ResourceDoesNotExistException();
+      throw error;
+    }
+  }
+
+  async findMangasFromCollection(
+    collectionId: string,
+  ): Promise<CollectionManga[]> {
+    try {
+      const collectionWithMangas =
+        await this.postgresService.collection.findUnique({
+          where: {
+            id: collectionId,
+          },
+          include: {
+            MangaCollection: {
+              include: {
+                manga: true,
+              },
+            },
+          },
+        });
+      if (!collectionWithMangas) throw new ResourceDoesNotExistException();
+
+      const mangas: CollectionManga[] =
+        collectionWithMangas.MangaCollection.map((manga) => manga.manga);
+      return mangas;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async addMangaToCollection(
     collectionId: string,
     manga: CollectionManga,
   ): Promise<Collection> {
-    const updatedCollection = await this.postgresService.collection.update({
-      where: {
-        id: collectionId,
-      },
-      data: {
-        MangaCollection: {
-          create: [
-            {
-              manga: {
-                connectOrCreate: {
-                  where: {
-                    id: manga.id,
-                  },
-                  create: {
-                    cover: manga.cover,
-                    synopsis: manga.synopsis,
-                    name: manga.name,
-                    id: manga.id,
+    try {
+      const updatedCollection = await this.postgresService.collection.update({
+        where: {
+          id: collectionId,
+        },
+        data: {
+          MangaCollection: {
+            create: [
+              {
+                manga: {
+                  connectOrCreate: {
+                    where: {
+                      id: manga.id,
+                    },
+                    create: {
+                      cover: manga.cover,
+                      synopsis: manga.synopsis,
+                      name: manga.name,
+                      id: manga.id,
+                    },
                   },
                 },
               },
-            },
-          ],
+            ],
+          },
         },
-      },
-    });
+      });
 
-    return updatedCollection;
+      return updatedCollection;
+    } catch (error) {
+      if (error.code == 'P2025') throw new DependentResourceNotFoundException();
+      throw error;
+    }
   }
 
   async deleteMangaFromCollection(
@@ -163,7 +187,8 @@ export class CollectionsServiceService implements ICollectionsRepository {
 
       return { deleted: true };
     } catch (error) {
-      return { deleted: false };
+      if (error.code == 'P2017') throw new ResourceDoesNotExistException();
+      throw error;
     }
   }
 }

@@ -1,14 +1,23 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import { AnyNode, Cheerio, CheerioAPI, load } from 'cheerio';
 import { join } from 'path';
-import { ImageAnalyzer } from '../../utils';
-import { readJsonFileAsync } from '../../utils/read-json-file';
 import { Manga, Prisma } from '../../../prisma/prisma/mongo-client';
 import { IMangasRepository } from '../..//core/abstracts/mangas/mangas-repostitory.abstract';
 import { Chapter } from '../../core/entities/chapters';
 import { MangaEntity, MangaSimplified } from '../../core/entities/mangas';
+import {
+  ResourceDoesNotExistException,
+  ResourceNotFoundException,
+} from '../../core/errors';
+import { ImageAnalyzer } from '../../utils';
+import { readJsonFileAsync } from '../../utils/read-json-file';
 import { MongoService } from '../mongo-prisma/mongo-prisma.service';
 
 axiosRetry(axios, { retries: 3 });
@@ -29,9 +38,15 @@ export class MangasServicesService implements IMangasRepository {
 
   async getMangas(keywords: string[]): Promise<MangaSimplified[]> {
     if (keywords.length === 1) {
-      return await this.oneKeywordSearch(keywords[0]);
+      const mangas = await this.oneKeywordSearch(keywords[0]);
+      if (mangas.length === 0) throw new ResourceNotFoundException();
+
+      return mangas;
     } else {
-      return await this.multiFieldSearch(keywords);
+      const mangas = await this.multiFieldSearch(keywords);
+      if (mangas.length === 0) throw new ResourceNotFoundException();
+
+      return mangas;
     }
   }
 
@@ -90,8 +105,12 @@ export class MangasServicesService implements IMangasRepository {
       }
 
       return manga;
-    } catch (e) {
-      this.logger.log(e);
+    } catch (error) {
+      if (error.code == 'P2023') throw new ResourceDoesNotExistException();
+      throw new BadRequestException({
+        message: error.message,
+        statusCode: error.code,
+      });
     }
   }
 
