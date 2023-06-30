@@ -1,9 +1,13 @@
-import { Collection, CollectionManga } from '../../entities';
+import {
+  AddMangaToCollectionResponseEntity,
+  Collection,
+  CollectionManga,
+} from '../../entities';
 
 export abstract class ICollectionsRepository {
   abstract findCollections(userId: string): Promise<Collection[]>;
 
-  abstract addCollection(
+  abstract createCollection(
     userId: string,
     collectionInfo: Collection,
   ): Promise<Collection>;
@@ -21,7 +25,7 @@ export abstract class ICollectionsRepository {
   abstract addMangaToCollection(
     collectionId: string,
     manga: CollectionManga,
-  ): Promise<Collection>;
+  ): Promise<AddMangaToCollectionResponseEntity>;
 
   abstract deleteMangaFromCollection(
     collectionId: string,

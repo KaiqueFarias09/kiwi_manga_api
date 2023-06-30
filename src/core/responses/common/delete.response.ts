@@ -5,9 +5,9 @@ export class DeleteHttpResponse {
   status: string;
 
   @ApiProperty()
-  message: boolean;
+  message: string;
 
-  constructor(status: string, message: boolean) {
+  constructor(status: string, message: string) {
     this.status = status;
     this.message = message;
   }

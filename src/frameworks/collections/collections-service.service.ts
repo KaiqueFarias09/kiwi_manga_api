@@ -1,6 +1,10 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ICollectionsRepository } from '../../core/abstracts';
-import { Collection, CollectionManga } from '../../core/entities';
+import {
+  AddMangaToCollectionResponseEntity,
+  Collection,
+  CollectionManga,
+} from '../../core/entities';
 import {
   DependentResourceNotFoundException,
   ResourceDoesNotExistException,
@@ -30,7 +34,7 @@ export class CollectionsServiceService implements ICollectionsRepository {
     return collections;
   }
 
-  async addCollection(
+  async createCollection(
     userId: string,
     collectionInfo: Collection,
   ): Promise<Collection> {
@@ -120,7 +124,7 @@ export class CollectionsServiceService implements ICollectionsRepository {
   async addMangaToCollection(
     collectionId: string,
     manga: CollectionManga,
-  ): Promise<Collection> {
+  ): Promise<AddMangaToCollectionResponseEntity> {
     try {
       const updatedCollection = await this.postgresService.collection.update({
         where: {
@@ -149,7 +153,10 @@ export class CollectionsServiceService implements ICollectionsRepository {
         },
       });
 
-      return updatedCollection;
+      return {
+        collection: updatedCollection,
+        manga: manga,
+      };
     } catch (error) {
       if (error.code == 'P2025') throw new DependentResourceNotFoundException();
       throw error;

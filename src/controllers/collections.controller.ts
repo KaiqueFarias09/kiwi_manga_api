@@ -17,7 +17,16 @@ import {
   CollectionIdDto,
   DeleteMangaCollectionDto,
 } from '../core/dtos';
-import { Collection } from '../core/entities';
+import { HttpResponseStatus } from '../core/enums';
+import {
+  AddMangaToCollectionHttpResponse,
+  CreateCollectionHttpResponse,
+  DeleteCollectionHttpResponse,
+  DeleteMangaFromCollectionHttpResponse,
+  GetCollectionsHttpResponse,
+  GetMangasFromCollectionHttpResponse,
+  UpdateCollectionHttpResponse,
+} from '../core/responses';
 import { CollectionsUseCase } from '../use-cases';
 
 @ApiTags('collections')
@@ -33,35 +42,73 @@ export class CollectionsController {
   }
 
   @Get()
-  findCollections(@Param('id') userId: string): Promise<Collection[]> {
-    return this.collectionsService.findCollections(userId);
+  async findCollections(
+    @Param('id') userId: string,
+  ): Promise<GetCollectionsHttpResponse> {
+    const data = await this.collectionsService.findCollections(userId);
+    return {
+      status: HttpResponseStatus.SUCCESS,
+      data: {
+        collections: data,
+      },
+    };
   }
 
   @Post()
-  saveCollection(
+  async createCollection(
     @Param('id') userId: string,
     @Body() collectionDto: CollectionDto,
-  ): Promise<Collection> {
-    return this.collectionsService.saveCollection(userId, collectionDto);
+  ): Promise<CreateCollectionHttpResponse> {
+    const data = await this.collectionsService.createCollection(
+      userId,
+      collectionDto,
+    );
+
+    return {
+      status: HttpResponseStatus.SUCCESS,
+      data: { collection: data },
+    };
   }
 
   @Delete()
-  deleteCollection(@Body() deleteCollectionDto: CollectionIdDto) {
-    return this.collectionsService.deleteCollection(deleteCollectionDto.id);
+  async deleteCollection(
+    @Body() deleteCollectionDto: CollectionIdDto,
+  ): Promise<DeleteCollectionHttpResponse> {
+    await this.collectionsService.deleteCollection(deleteCollectionDto.id);
+    return {
+      status: HttpResponseStatus.SUCCESS,
+      message: 'Collection deleted successfully',
+    };
   }
 
   @Put()
-  updateCollection(@Body() collection: CollectionDto): Promise<Collection> {
-    return this.collectionsService.updateCollection(collection);
+  async updateCollection(
+    @Body() collection: CollectionDto,
+  ): Promise<UpdateCollectionHttpResponse> {
+    const data = await this.collectionsService.updateCollection(collection);
+    return {
+      status: HttpResponseStatus.SUCCESS,
+      data: { collection: data },
+    };
   }
 
   @Get('mangas')
-  findCollectionMangas(@Body() collectionIdDto: CollectionIdDto) {
-    return this.collectionsService.findCollectionMangas(collectionIdDto.id);
+  async findCollectionMangas(
+    @Body() collectionIdDto: CollectionIdDto,
+  ): Promise<GetMangasFromCollectionHttpResponse> {
+    const data = await this.collectionsService.findCollectionMangas(
+      collectionIdDto.id,
+    );
+    return {
+      status: HttpResponseStatus.SUCCESS,
+      data: {
+        mangas: data,
+      },
+    };
   }
 
   @Post('mangas')
-  addMangaToCollection(
+  async addMangaToCollection(
     @Body()
     {
       collectionId,
@@ -70,22 +117,33 @@ export class CollectionsController {
       mangaName,
       mangaSynopsis,
     }: AddMangaCollectionDto,
-  ) {
-    return this.collectionsService.addMangaToCollection(collectionId, {
-      cover: mangaCover,
-      name: mangaName,
-      synopsis: mangaSynopsis,
-      id: mangaId,
-    });
+  ): Promise<AddMangaToCollectionHttpResponse> {
+    const data = await this.collectionsService.addMangaToCollection(
+      collectionId,
+      {
+        cover: mangaCover,
+        name: mangaName,
+        synopsis: mangaSynopsis,
+        id: mangaId,
+      },
+    );
+    return {
+      status: HttpResponseStatus.SUCCESS,
+      data: { manga: data.manga, collection: data.collection },
+    };
   }
 
   @Delete('mangas')
-  deleteMangaFromCollection(
+  async deleteMangaFromCollection(
     @Body() { collectionId, mangaId }: DeleteMangaCollectionDto,
-  ) {
-    return this.collectionsService.deleteMangaFromCollection(
+  ): Promise<DeleteMangaFromCollectionHttpResponse> {
+    await this.collectionsService.deleteMangaFromCollection(
       collectionId,
       mangaId,
     );
+    return {
+      status: HttpResponseStatus.SUCCESS,
+      message: 'Manga deleted from collection successfully',
+    };
   }
 }
