@@ -54,9 +54,11 @@ export class MangasController {
     status: 200,
     type: GetMangaByIdHttpResponse,
   })
-  @Get('/:id')
-  async findUnique(@Param('id') id: string): Promise<GetMangaByIdHttpResponse> {
-    const data = await this.mangasService.getManga(id);
+  @Get('/:mangaId')
+  async findUnique(
+    @Param('mangaId') mangaId: string,
+  ): Promise<GetMangaByIdHttpResponse> {
+    const data = await this.mangasService.getManga(mangaId);
     return {
       status: HttpResponseStatus.SUCCESS,
       data: {
