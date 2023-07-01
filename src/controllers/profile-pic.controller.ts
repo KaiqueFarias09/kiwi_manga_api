@@ -20,7 +20,7 @@ import { ProfilePicUseCase } from '../use-cases/profile-pic';
 @ApiTags('profile-pic')
 @ApiSecurity('Authorization')
 @UseGuards(AuthGuard('api-key'))
-@Controller(':id/profile-pic')
+@Controller(':userId/profile-pic')
 export class ProfilePicController {
   profilePicService: ProfilePicUseCase;
   constructor(
@@ -32,7 +32,7 @@ export class ProfilePicController {
   @ApiResponse({ status: 200, type: FindProfilePicHttpResponse })
   @Get()
   async findProfilePic(
-    @Param('id') userID: string,
+    @Param() userID: string,
   ): Promise<FindProfilePicHttpResponse> {
     const profilePic = await this.profilePicService.findProfilePic(userID);
     return {
@@ -46,7 +46,7 @@ export class ProfilePicController {
   @ApiResponse({ status: 200, type: UpdateProfilePicHttpResponse })
   @Put()
   async updateProfilePic(
-    @Param('id') userID: string,
+    @Param() userID: string,
     @Body() { profilePic }: UpdateProfilePicDto,
   ): Promise<UpdateProfilePicHttpResponse> {
     const updatedProfilePic = await this.profilePicService.updateProfilePic({
