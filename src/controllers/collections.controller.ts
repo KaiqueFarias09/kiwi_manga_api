@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import {
   AddMangaCollectionDto,
   CollectionDto,
@@ -32,7 +32,7 @@ import { CollectionsUseCase } from '../use-cases';
 @ApiTags('collections')
 @ApiSecurity('Authorization')
 @UseGuards(AuthGuard('api-key'))
-@Controller(':id/collections')
+@Controller(':userId/collections')
 export class CollectionsController {
   collectionsService: CollectionsUseCase;
   constructor(
@@ -41,9 +41,10 @@ export class CollectionsController {
     this.collectionsService = collectionUseCaseService;
   }
 
+  @ApiResponse({ status: 200, type: GetCollectionsHttpResponse })
   @Get()
   async findCollections(
-    @Param('id') userId: string,
+    @Param('userId') userId: string,
   ): Promise<GetCollectionsHttpResponse> {
     const data = await this.collectionsService.findCollections(userId);
     return {
@@ -54,9 +55,10 @@ export class CollectionsController {
     };
   }
 
+  @ApiResponse({ status: 200, type: CreateCollectionHttpResponse })
   @Post()
   async createCollection(
-    @Param('id') userId: string,
+    @Param('userId') userId: string,
     @Body() collectionDto: CollectionDto,
   ): Promise<CreateCollectionHttpResponse> {
     const data = await this.collectionsService.createCollection(
@@ -70,6 +72,7 @@ export class CollectionsController {
     };
   }
 
+  @ApiResponse({ status: 200, type: DeleteCollectionHttpResponse })
   @Delete()
   async deleteCollection(
     @Body() deleteCollectionDto: CollectionIdDto,
@@ -81,6 +84,7 @@ export class CollectionsController {
     };
   }
 
+  @ApiResponse({ status: 200, type: UpdateCollectionHttpResponse })
   @Put()
   async updateCollection(
     @Body() collection: CollectionDto,
@@ -92,6 +96,7 @@ export class CollectionsController {
     };
   }
 
+  @ApiResponse({ status: 200, type: GetMangasFromCollectionHttpResponse })
   @Get('mangas')
   async findCollectionMangas(
     @Body() collectionIdDto: CollectionIdDto,
@@ -107,6 +112,7 @@ export class CollectionsController {
     };
   }
 
+  @ApiResponse({ status: 200, type: AddMangaToCollectionHttpResponse })
   @Post('mangas')
   async addMangaToCollection(
     @Body()
@@ -133,6 +139,7 @@ export class CollectionsController {
     };
   }
 
+  @ApiResponse({ status: 200, type: DeleteMangaFromCollectionHttpResponse })
   @Delete('mangas')
   async deleteMangaFromCollection(
     @Body() { collectionId, mangaId }: DeleteMangaCollectionDto,
