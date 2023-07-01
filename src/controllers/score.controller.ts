@@ -20,7 +20,7 @@ import { ScoreUseCase } from '../use-cases/score';
 @ApiTags('score')
 @ApiSecurity('Authorization')
 @UseGuards(AuthGuard('api-key'))
-@Controller('score')
+@Controller(':userId/score')
 export class ScoreController {
   scoreService: ScoreUseCase;
   constructor(@Inject(ScoreUseCase) scoreUseCaseService: ScoreUseCase) {
@@ -28,9 +28,9 @@ export class ScoreController {
   }
 
   @ApiResponse({ status: 200, type: GetPodiumHttpResponse })
-  @Get(':id')
+  @Get()
   async getPodiumAndUserScore(
-    @Param('id') userID: string,
+    @Param('userId') userID: string,
   ): Promise<GetPodiumHttpResponse> {
     const data = await this.scoreService.getPodiumAndUserScore(userID);
     return {
@@ -40,9 +40,9 @@ export class ScoreController {
   }
 
   @ApiResponse({ status: 200, type: IncreaseScoreHttpResponse })
-  @Put(':id')
+  @Put()
   async increaseScore(
-    @Param('id') userID: string,
+    @Param('userId') userID: string,
     @Body() { increase }: IncreaseScoreDto,
   ): Promise<IncreaseScoreHttpResponse> {
     const data = await this.scoreService.increaseScore(userID, increase);
