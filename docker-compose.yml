@@ -1,14 +1,8 @@
 version: '3'
+name: kiwi-manga
 services:
-  # app:
-  #   build: .
-  #   ports:
-  #     - ${SERVER_PORT}:3000
-  #     - 9229:9229
-  #   env_file:
-  #     - .env
   postgresql:
-    container_name: kiwiPostgresDb
+    container_name: postgres
     image: 'postgres:latest'
     environment:
       - POSTGRES_USER=kiwimanga
@@ -19,7 +13,7 @@ services:
     volumes:
       - 'postgres:/var/lib/postgresql/data'
   mongodb:
-    container_name: kiwiMongoDb
+    container_name: mongodb
     image: 'mongo:latest'
     environment:
       - MONGO_INITDB_ROOT_USERNAME=kiwimanga
@@ -29,6 +23,13 @@ services:
       - '27017:27017'
     volumes:
       - 'mongo:/data/db'
+  app:
+    container_name: api
+    build: .
+    ports:
+      - 9229:9229
+    env_file:
+      - .env
 volumes:
   postgres:
   mongo:

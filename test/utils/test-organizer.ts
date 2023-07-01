@@ -20,6 +20,7 @@ export class TestSetup {
   private testProperties = new TestProperties();
 
   async setup() {
+    const randomValue = Math.floor(Math.random() * 1000000);
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -32,7 +33,7 @@ export class TestSetup {
       }),
     );
     await this.app.init();
-    await this.app.listen(3333);
+    await this.app.listen(0);
 
     const hash = await argon.hash(this.testProperties.defaultTestUser.password);
     this.postgresService = this.app.get(PostgresService);
@@ -40,13 +41,15 @@ export class TestSetup {
     this.mongoService = this.app.get(MongoService);
     this.defaultTestUser = await this.postgresService.user.create({
       data: {
-        email: this.testProperties.defaultTestUser.email,
+        email: this.testProperties.defaultTestUser.email + randomValue,
         nickname: this.testProperties.defaultTestUser.nickname,
         password: hash,
       },
     });
 
-    pactum.request.setBaseUrl('http://localhost:3333');
+    pactum.request.setBaseUrl(
+      `http://localhost:${this.app.getHttpServer().address().port}`,
+    );
     pactum.request.setDefaultHeaders({
       Authorization: this.configService.get<string>('ADMIN_TOKEN'),
     });

@@ -32,9 +32,9 @@ export class ProfilePicController {
   @ApiResponse({ status: 200, type: FindProfilePicHttpResponse })
   @Get()
   async findProfilePic(
-    @Param() userID: string,
+    @Param('userId') userId: string,
   ): Promise<FindProfilePicHttpResponse> {
-    const profilePic = await this.profilePicService.findProfilePic(userID);
+    const profilePic = await this.profilePicService.findProfilePic(userId);
     return {
       status: HttpResponseStatus.SUCCESS,
       data: {
@@ -46,12 +46,12 @@ export class ProfilePicController {
   @ApiResponse({ status: 200, type: UpdateProfilePicHttpResponse })
   @Put()
   async updateProfilePic(
-    @Param() userID: string,
+    @Param('userId') userId: string,
     @Body() { profilePic }: UpdateProfilePicDto,
   ): Promise<UpdateProfilePicHttpResponse> {
     const updatedProfilePic = await this.profilePicService.updateProfilePic({
       profilePic,
-      userId: userID,
+      userId: userId,
     });
 
     return {

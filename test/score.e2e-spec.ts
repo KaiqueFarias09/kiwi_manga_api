@@ -11,7 +11,7 @@ let defaultTestUser: User;
 beforeAll(async () => {
   await testSetup.setup();
   ({ defaultTestUser } = testSetup.getServices());
-  scoreBasePath = `/score/${defaultTestUser.id}`;
+  scoreBasePath = `/${defaultTestUser.id}/score`;
 });
 
 afterAll(async () => {
@@ -37,7 +37,7 @@ describe('Score', () => {
 });
 
 describe('Score Error Handling', () => {
-  const nonExistentUserScoreBasePath = `/score/nonexistentuser`;
+  const nonExistentUserScoreBasePath = `/score/nonExistentUser`;
 
   it('should not get score for non-existent user', async () => {
     return pactum.spec().get(nonExistentUserScoreBasePath).expectStatus(404);
