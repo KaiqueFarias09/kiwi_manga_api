@@ -22,7 +22,7 @@ import { FavoritesUseCase } from '../use-cases';
 @ApiTags('favorites')
 @ApiSecurity('Authorization')
 @UseGuards(AuthGuard('api-key'))
-@Controller(':id/favorites')
+@Controller(':userId/favorites')
 export class FavoritesController {
   favoritesService: FavoritesUseCase;
   constructor(
@@ -34,7 +34,7 @@ export class FavoritesController {
   @ApiResponse({ status: 200, type: GetFavoritesHttpResponse })
   @Get()
   async getFavorites(
-    @Param('id') userId: string,
+    @Param('userId') userId: string,
   ): Promise<GetFavoritesHttpResponse> {
     const data = await this.favoritesService.getFavorites(userId);
     return {
@@ -46,7 +46,7 @@ export class FavoritesController {
   @ApiResponse({ status: 200, type: AddFavoriteHttpResponse })
   @Post()
   async addFavorite(
-    @Param('id') userId: string,
+    @Param('userId') userId: string,
     @Body() manga: CollectionMangaDto,
   ): Promise<AddFavoriteHttpResponse> {
     const data = await this.favoritesService.addFavorite(manga, userId);
@@ -59,7 +59,7 @@ export class FavoritesController {
   @ApiResponse({ status: 200, type: DeleteFavoriteHttpResponse })
   @Delete()
   async removeFavorite(
-    @Param('id') userId: string,
+    @Param('userId') userId: string,
     @Body() manga: CollectionMangaDto,
   ): Promise<DeleteFavoriteHttpResponse> {
     await this.favoritesService.removeFavorite(manga, userId);
