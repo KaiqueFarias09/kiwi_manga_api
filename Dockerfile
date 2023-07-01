@@ -30,7 +30,7 @@ COPY --chown=node:node package*.json ./
 COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modules
 COPY --chown=node:node . .
 
-RUN npm run build
+RUN npm run prisma:generate && npm run build
 
 COPY --chown=node:node --from=development /usr/src/app/package-lock.json ./
 RUN npm ci --only=production && npm cache clean --force
@@ -46,10 +46,8 @@ RUN apk add --no-cache cairo jpeg pango giflib
 
 COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
 COPY --chown=node:node --from=build /usr/src/app/dist ./dist
+COPY --chown=node:node --from=build /usr/src/app/prisma ./prisma  
 COPY --chown=node:node ./resources ./resources
 COPY --chown=node:node ./genres.json ./genres.json 
-COPY --chown=node:node ./prisma ./prisma  
-
-RUN npx prisma generate --schema ./prisma/schema-postgres.prisma && prisma generate --schema ./prisma/schema-mongo.prisma
 
 CMD [ "node", "dist/main.js" ]
