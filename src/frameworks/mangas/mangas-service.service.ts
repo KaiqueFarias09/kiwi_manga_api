@@ -23,16 +23,16 @@ import { MongoService } from '../mongo-prisma/mongo-prisma.service';
 axiosRetry(axios, { retries: 3 });
 @Injectable()
 export class MangasServicesService implements IMangasRepository {
-  prisma: MongoService;
+  mongo: MongoService;
   imageComparer: ImageAnalyzer;
   private genres = readJsonFileAsync(join(__dirname, '../../../genres.json'));
   private logger = new Logger('MangasServicesService');
 
   constructor(
-    @Inject(MongoService) prisma: MongoService,
+    @Inject(MongoService) mongoService: MongoService,
     @Inject(ImageAnalyzer) imageComparer: ImageAnalyzer,
   ) {
-    this.prisma = prisma;
+    this.mongo = mongoService;
     this.imageComparer = imageComparer;
   }
 
@@ -51,10 +51,10 @@ export class MangasServicesService implements IMangasRepository {
   }
 
   async getRandomManga(): Promise<MangaEntity> {
-    const count = await this.prisma.manga.count();
+    const count = await this.mongo.manga.count();
     const skip = Math.floor(Math.random() * count);
 
-    const randomManga = await this.prisma.manga.findFirst({
+    const randomManga = await this.mongo.manga.findFirst({
       skip,
       where: { hasCover: true },
     });
@@ -67,7 +67,7 @@ export class MangasServicesService implements IMangasRepository {
       updatedAt: randomManga.updatedAt,
       synopsis: randomManga.synopsis,
       genres: randomManga.genres,
-      chapters: await this.prisma.chapter.findMany({
+      chapters: await this.mongo.chapter.findMany({
         where: { novelCoolMangaId: randomManga.id },
       }),
       hasCover: randomManga.hasCover,
@@ -77,7 +77,7 @@ export class MangasServicesService implements IMangasRepository {
 
   async getManga(mangaId: string): Promise<MangaEntity> {
     try {
-      const manga = await this.prisma.manga.findFirst({
+      const manga = await this.mongo.manga.findFirst({
         where: {
           id: mangaId,
         },
@@ -93,7 +93,7 @@ export class MangasServicesService implements IMangasRepository {
           mangaPageUrl: manga.url,
         });
 
-        this.prisma.manga.update({
+        this.mongo.manga.update({
           data: {
             chapters: { createMany: { data: scrappedMangaInfo.chapters } },
           },
@@ -200,7 +200,7 @@ export class MangasServicesService implements IMangasRepository {
       const validMangas = mangas.filter((manga) => manga.chapters.length > 0);
       const promises = validMangas.map(async (manga) => {
         try {
-          const result = await this.prisma.manga.create({
+          const result = await this.mongo.manga.create({
             data: {
               source: 'novelcool',
               cover: manga.cover,
@@ -238,7 +238,7 @@ export class MangasServicesService implements IMangasRepository {
   private async searchMangaNamesDb(
     searchTerm: string,
   ): Promise<MangaSimplified[]> {
-    return this.prisma.manga.findMany({
+    return this.mongo.manga.findMany({
       where: {
         name: {
           contains: searchTerm,
@@ -259,7 +259,7 @@ export class MangasServicesService implements IMangasRepository {
   private async multiFieldSearchDb(
     searchTerms: string[],
   ): Promise<MangaSimplified[]> {
-    const mangas = await this.prisma.manga.findMany({
+    const mangas = await this.mongo.manga.findMany({
       where: {
         hasCover: true,
         OR: [
