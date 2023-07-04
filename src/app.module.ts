@@ -21,6 +21,7 @@ import {
   ScoreUseCaseModule,
 } from './use-cases';
 
+import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule } from '@nestjs/config';
 import { ApiSecurity } from '@nestjs/swagger';
 import { UsersController } from './controllers/users.controller';
@@ -43,6 +44,12 @@ import { UsersUseCaseModule } from './use-cases/users';
     UsersController,
   ],
   imports: [
+    CacheModule.register({
+      isGlobal: true,
+      host: 'localhost',
+      port: 6379,
+      store: 'redis',
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     HealthUseCaseModule,
     ChapterUseCaseModule,
