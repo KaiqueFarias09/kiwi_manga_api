@@ -1,18 +1,24 @@
 import { Module } from '@nestjs/common';
 
-import { IAuthService, IAuthStrategy } from '../../core/abstracts';
-import { AuthStrategyService } from './auth-strategy.service';
-import { AuthService } from './auth-service.service';
 import { JwtModule } from '@nestjs/jwt';
+import {
+  IApiKeyStrategy,
+  IAuthService,
+  IJwtStrategy,
+} from '../../core/abstracts';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
+import { AuthService } from './auth-service.service';
+import { ApiKeyStrategyService } from './strategies/api-key.strategy';
+import { JwtStrategyService } from './strategies/jwt.strategy';
 
 @Module({
   imports: [JwtModule.register({})],
   providers: [
-    { provide: IAuthStrategy, useClass: AuthStrategyService },
+    { provide: IApiKeyStrategy, useClass: ApiKeyStrategyService },
+    { provide: IJwtStrategy, useClass: JwtStrategyService },
     { provide: IAuthService, useClass: AuthService },
     PostgresService,
   ],
-  exports: [IAuthStrategy, IAuthService],
+  exports: [IApiKeyStrategy, IAuthService],
 })
 export class AuthServiceModule {}

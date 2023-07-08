@@ -2,17 +2,17 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import Strategy from 'passport-headerapikey';
-import { IAuthStrategy } from '../../core/abstracts';
+import { IApiKeyStrategy } from '../../../core/abstracts';
 
 @Injectable()
-export class AuthStrategyService
+export class ApiKeyStrategyService
   extends PassportStrategy(Strategy, 'api-key')
-  implements IAuthStrategy
+  implements IApiKeyStrategy
 {
   configService: ConfigService;
   constructor(@Inject(ConfigService) configService: ConfigService) {
     super(
-      { header: 'Authorization', prefix: '' },
+      { header: 'X-API-Key', prefix: '' },
       true,
       async (
         apiKey: string,
