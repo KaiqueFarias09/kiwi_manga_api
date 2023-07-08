@@ -15,7 +15,7 @@ import { SigninHttpResponse, SignupHttpResponse } from '../core/responses';
 import { AuthServiceUseCases } from '../use-cases/auth/auth-service-use-cases';
 
 @ApiTags('auth')
-@ApiSecurity('Authorization')
+@ApiSecurity('X-API-Key')
 @UseGuards(AuthGuard('api-key'))
 @Controller('auth')
 export class AuthController {

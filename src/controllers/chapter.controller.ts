@@ -16,7 +16,7 @@ import {
 import { ChapterUseCase } from '../use-cases';
 
 @ApiTags('chapters')
-@ApiSecurity('Authorization')
+@ApiSecurity('X-API-Key')
 @Controller('chapters')
 @UseGuards(AuthGuard('api-key'))
 export class ChapterController {

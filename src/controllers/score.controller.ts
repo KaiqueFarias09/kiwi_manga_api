@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { HttpResponseStatus } from '../core/enums';
 import { IncreaseScoreDto } from '../core/dtos';
+import { HttpResponseStatus } from '../core/enums';
 import {
   GetPodiumHttpResponse,
   IncreaseScoreHttpResponse,
@@ -18,8 +18,8 @@ import {
 import { ScoreUseCase } from '../use-cases/score';
 
 @ApiTags('score')
-@ApiSecurity('Authorization')
-@UseGuards(AuthGuard('api-key'))
+@ApiSecurity('X-API-Key')
+@UseGuards(AuthGuard('api-key'), AuthGuard('jwt'))
 @Controller(':userId/score')
 export class ScoreController {
   scoreService: ScoreUseCase;

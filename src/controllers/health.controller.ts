@@ -6,7 +6,7 @@ import { GetHealthHttpResponse } from '../core/responses';
 import { HealthUseCases } from '../use-cases/health/health-use-case';
 
 @ApiTags('health')
-@ApiSecurity('Authorization')
+@ApiSecurity('X-API-Key')
 @UseGuards(AuthGuard('api-key'))
 @Controller('health')
 export class HealthController {
