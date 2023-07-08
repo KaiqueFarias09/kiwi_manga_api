@@ -19,10 +19,7 @@ async function bootstrap() {
     .setTitle('Kiwi API Documentation')
     .setDescription(' A API that provides programmatic access to manga data')
     .setVersion('1.0')
-    .addApiKey(
-      { type: 'apiKey', name: 'Authorization', in: 'header' },
-      'Authorization',
-    )
+    .addApiKey({ type: 'apiKey', name: 'X-API-Key', in: 'header' }, 'X-API-Key')
     .build();
   const document = SwaggerModule.createDocument(app, config);
 

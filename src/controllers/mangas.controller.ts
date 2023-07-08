@@ -20,7 +20,7 @@ import {
 import { MangasUseCase } from '../use-cases/mangas/mangas-use-case';
 
 @ApiTags('mangas')
-@ApiSecurity('Authorization')
+@ApiSecurity('X-API-Key')
 @UseInterceptors(CacheInterceptor)
 @Controller('mangas')
 @UseGuards(AuthGuard('api-key'))

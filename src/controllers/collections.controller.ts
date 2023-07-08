@@ -30,8 +30,8 @@ import {
 import { CollectionsUseCase } from '../use-cases';
 
 @ApiTags('collections')
-@ApiSecurity('Authorization')
-@UseGuards(AuthGuard('api-key'))
+@ApiSecurity('X-API-Key')
+@UseGuards(AuthGuard('api-key'), AuthGuard('jwt'))
 @Controller(':userId/collections')
 export class CollectionsController {
   collectionsService: CollectionsUseCase;

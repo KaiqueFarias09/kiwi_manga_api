@@ -39,11 +39,29 @@ export class TestSetup {
     this.postgresService = this.app.get(PostgresService);
     this.configService = this.app.get(ConfigService);
     this.mongoService = this.app.get(MongoService);
-    this.defaultTestUser = await this.postgresService.user.create({
-      data: {
+
+    const response = await fetch(
+      `http://localhost:${this.app.getHttpServer().address().port}/auth/signup`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': this.configService.get<string>('ADMIN_TOKEN'),
+        },
+        body: JSON.stringify({
+          email: this.testProperties.defaultTestUser.email + randomValue,
+          nickname: this.testProperties.defaultTestUser.nickname,
+          password: hash,
+        }),
+      },
+    );
+    const data = await response.json();
+    console.log(data);
+    const jwtToken = data.data.access_token;
+
+    this.defaultTestUser = await this.postgresService.user.findUnique({
+      where: {
         email: this.testProperties.defaultTestUser.email + randomValue,
-        nickname: this.testProperties.defaultTestUser.nickname,
-        password: hash,
       },
     });
 
@@ -51,7 +69,8 @@ export class TestSetup {
       `http://localhost:${this.app.getHttpServer().address().port}`,
     );
     pactum.request.setDefaultHeaders({
-      Authorization: this.configService.get<string>('ADMIN_TOKEN'),
+      'X-API-Key': this.configService.get<string>('ADMIN_TOKEN'),
+      Authorization: `Bearer ${jwtToken}`,
     });
   }
 

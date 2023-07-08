@@ -10,18 +10,18 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { CollectionMangaDto } from '../core/dtos';
 import { HttpResponseStatus } from '../core/enums';
 import {
   AddFavoriteHttpResponse,
   DeleteFavoriteHttpResponse,
   GetFavoritesHttpResponse,
 } from '../core/responses';
-import { CollectionMangaDto } from '../core/dtos';
 import { FavoritesUseCase } from '../use-cases';
 
 @ApiTags('favorites')
-@ApiSecurity('Authorization')
-@UseGuards(AuthGuard('api-key'))
+@ApiSecurity('X-API-Key')
+@UseGuards(AuthGuard('api-key'), AuthGuard('jwt'))
 @Controller(':userId/favorites')
 export class FavoritesController {
   favoritesService: FavoritesUseCase;

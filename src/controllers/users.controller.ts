@@ -1,5 +1,15 @@
-import { Body, Controller, Delete, Param, Patch } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { GetUser } from '../decorators';
 import {
   DeleteAccountDto,
   UpdateEmailDto,
@@ -16,12 +26,19 @@ import {
 import { UsersUseCase } from '../use-cases/users';
 
 @ApiTags('users')
-@ApiSecurity('Authorization')
+@ApiSecurity('X-API-Key')
+@UseGuards(AuthGuard('api-key'), AuthGuard('jwt'))
 @Controller('users/:userId')
 export class UsersController {
   userService: UsersUseCase;
   constructor(userService: UsersUseCase) {
     this.userService = userService;
+  }
+
+  @Get()
+  getMe(@GetUser() user: any) {
+    console.log(user);
+    return user;
   }
 
   @ApiResponse({ status: 200, type: UpdatePasswordHttpResponse })
