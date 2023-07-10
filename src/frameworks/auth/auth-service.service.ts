@@ -2,9 +2,9 @@ import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
-import { AccessTokenEntity } from '../../core/entities';
 import { IAuthService } from '../../core/abstracts/';
 import { SignTokenDto, SigninDto, SignupDto } from '../../core/dtos';
+import { AccessTokenEntity } from '../../core/entities';
 import { ResourceAlreadyExistException } from '../../core/errors/';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
 
@@ -74,7 +74,7 @@ export class AuthService implements IAuthService {
     const secret = this.config.get('JWT_SECRET');
 
     const token = await this.jwt.signAsync(payload, {
-      expiresIn: '15m',
+      expiresIn: '36500d',
       secret: secret,
     });
 
