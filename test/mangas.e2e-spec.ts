@@ -8,7 +8,7 @@ const testSetup = new TestSetup();
 let mongoService: MongoService;
 const mangasBasePath = '/mangas';
 beforeAll(async () => {
-  await testSetup.setup();
+  await testSetup.setup({ shouldCreateDefaults: true });
   ({ mongoService } = testSetup.getServices());
 });
 

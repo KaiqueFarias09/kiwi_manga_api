@@ -10,7 +10,7 @@ let postgresService: PostgresService;
 let defaultTestUser: User;
 let favoritesBasePath: string;
 beforeAll(async () => {
-  await testSetup.setup();
+  await testSetup.setup({ shouldCreateDefaults: true });
   ({ defaultTestUser, postgresService } = testSetup.getServices());
   favoritesBasePath = `/${defaultTestUser.id}/favorites`;
 });

@@ -20,6 +20,7 @@ import {
 import { FavoritesUseCase } from '../use-cases';
 
 @ApiTags('favorites')
+@ApiSecurity('Authorization')
 @ApiSecurity('X-API-Key')
 @UseGuards(AuthGuard('api-key'), AuthGuard('jwt'))
 @Controller(':userId/favorites')

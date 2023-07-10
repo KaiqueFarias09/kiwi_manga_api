@@ -19,6 +19,7 @@ import { ScoreUseCase } from '../use-cases/score';
 
 @ApiTags('score')
 @ApiSecurity('X-API-Key')
+@ApiSecurity('Authorization')
 @UseGuards(AuthGuard('api-key'), AuthGuard('jwt'))
 @Controller(':userId/score')
 export class ScoreController {

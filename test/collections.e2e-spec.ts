@@ -9,7 +9,7 @@ const testProperties = new TestProperties();
 let defaultTestUser: User;
 let postgresService: PostgresService;
 beforeAll(async () => {
-  await testSetup.setup();
+  await testSetup.setup({ shouldCreateDefaults: true });
   ({ postgresService, defaultTestUser } = testSetup.getServices());
 });
 

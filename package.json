@@ -18,7 +18,13 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --watch --no-cache --config ./test/jest-e2e.json"
+    "test:e2e": "jest --watch --no-cache --config ./test/jest-e2e.json --runInBand",
+    "install:all": "npm i && npm run prisma:generate",
+    "remove:cache": "npm run remove:dist && npm run remove:node_modules && npm run remove:prisma && npm run remove:package_lock.json",
+    "remove:dist": "rm -rf dist",
+    "remove:node_modules": "rm -rf node_modules",
+    "remove:package_lock.json": "rm package-lock.json",
+    "remove:prisma": "rm -rf prisma/prisma/mongo-client && rm -rf prisma/prisma/postgres-client"
   },
   "dependencies": {
     "@nestjs/cache-manager": "^2.0.1",
@@ -46,6 +52,7 @@
     "resemblejs": "^5.0.0",
     "rxjs": "^7.2.0",
     "sharp": "^0.32.1",
+    "swagger-themes": "^1.2.29",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

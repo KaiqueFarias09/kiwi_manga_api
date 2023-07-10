@@ -12,12 +12,11 @@ export class PasswordVerifierMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     const { password } = req.body;
-    const userId = req.url.split('/')[1];
 
+    const userId = req.url.split('/')[1];
     const user = await this.postgresService.user.findUnique({
       where: { id: userId },
     });
-
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
