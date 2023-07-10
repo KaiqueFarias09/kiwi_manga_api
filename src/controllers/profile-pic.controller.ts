@@ -19,6 +19,7 @@ import { ProfilePicUseCase } from '../use-cases/profile-pic';
 
 @ApiTags('profile-pic')
 @ApiSecurity('X-API-Key')
+@ApiSecurity('Authorization')
 @UseGuards(AuthGuard('api-key'), AuthGuard('jwt'))
 @Controller(':userId/profile-pic')
 export class ProfilePicController {
