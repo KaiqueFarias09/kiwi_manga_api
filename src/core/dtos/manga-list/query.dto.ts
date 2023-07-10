@@ -1,17 +1,14 @@
-import { IsArray, IsOptional } from 'class-validator';
-import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
 
 export class QueryDto {
-  @ApiProperty({ required: false, isArray: true, type: Array<string> })
-  @IsOptional()
-  @IsArray()
-  @Transform(({ value }) => {
-    if (typeof value === 'string') {
-      return value.split('&');
-    } else {
-      return value;
-    }
+  @ApiProperty({
+    required: true,
+    example: 'Boruto',
+    description:
+      'The keyword property represents the search term to be used when querying for specific manga. This could be a manga title, author, or any related keyword. Although it is marked as optional for validation, it is essentially needed for a successful API request. In the given example, "Boruto" is the keyword used to fetch mangas related to this term.',
   })
-  keywords: string[];
+  @IsOptional()
+  @IsString()
+  keyword: string;
 }
