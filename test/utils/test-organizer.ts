@@ -19,8 +19,11 @@ export class TestSetup {
   private defaultTestUser: User;
   private testProperties = new TestProperties();
 
-  async setup() {
-    const randomValue = Math.floor(Math.random() * 1000000);
+  async setup({
+    shouldCreateDefaults = true,
+  }: {
+    shouldCreateDefaults: boolean;
+  }) {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -34,44 +37,29 @@ export class TestSetup {
     );
     await this.app.init();
     await this.app.listen(0);
+    const baseUrl = `http://localhost:${
+      this.app.getHttpServer().address().port
+    }`;
 
-    const hash = await argon.hash(this.testProperties.defaultTestUser.password);
     this.postgresService = this.app.get(PostgresService);
     this.configService = this.app.get(ConfigService);
     this.mongoService = this.app.get(MongoService);
 
-    const response = await fetch(
-      `http://localhost:${this.app.getHttpServer().address().port}/auth/signup`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': this.configService.get<string>('ADMIN_TOKEN'),
+    if (shouldCreateDefaults) {
+      const randomValue = Math.floor(Math.random() * 1000000);
+      const jwtToken = await this.getJwtToken(baseUrl, randomValue);
+      this.defaultTestUser = await this.postgresService.user.findUnique({
+        where: {
+          email: randomValue + this.testProperties.defaultTestUser.email,
         },
-        body: JSON.stringify({
-          email: this.testProperties.defaultTestUser.email + randomValue,
-          nickname: this.testProperties.defaultTestUser.nickname,
-          password: hash,
-        }),
-      },
-    );
-    const data = await response.json();
-    console.log(data);
-    const jwtToken = data.data.access_token;
+      });
 
-    this.defaultTestUser = await this.postgresService.user.findUnique({
-      where: {
-        email: this.testProperties.defaultTestUser.email + randomValue,
-      },
-    });
-
-    pactum.request.setBaseUrl(
-      `http://localhost:${this.app.getHttpServer().address().port}`,
-    );
-    pactum.request.setDefaultHeaders({
-      'X-API-Key': this.configService.get<string>('ADMIN_TOKEN'),
-      Authorization: `Bearer ${jwtToken}`,
-    });
+      pactum.request.setBaseUrl(baseUrl);
+      pactum.request.setDefaultHeaders({
+        'X-API-Key': this.configService.get<string>('ADMIN_TOKEN'),
+        Authorization: `Bearer ${jwtToken}`,
+      });
+    }
   }
 
   async teardown(testHasDeleteUserMethod?: boolean) {
@@ -91,5 +79,24 @@ export class TestSetup {
       mongoService: this.mongoService,
       defaultTestUser: this.defaultTestUser,
     };
+  }
+
+  private async getJwtToken(baseUrl: string, randomValue: number) {
+    const hash = await argon.hash(this.testProperties.defaultTestUser.password);
+    const response = await fetch(`${baseUrl}/auth/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': this.configService.get<string>('ADMIN_TOKEN'),
+      },
+      body: JSON.stringify({
+        email: randomValue + this.testProperties.defaultTestUser.email,
+        nickname: this.testProperties.defaultTestUser.nickname,
+        password: hash,
+      }),
+    });
+
+    const responseData = await response.json();
+    return responseData.data.access_token;
   }
 }

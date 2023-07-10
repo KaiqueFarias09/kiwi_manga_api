@@ -9,7 +9,7 @@ const testProperties = new TestProperties();
 let baseProfilePicPath: string;
 let defaultTestUser: User;
 beforeAll(async () => {
-  await testSetup.setup();
+  await testSetup.setup({ shouldCreateDefaults: true });
   ({ defaultTestUser } = testSetup.getServices());
   baseProfilePicPath = `/${defaultTestUser.id}/profile-pic`;
 });

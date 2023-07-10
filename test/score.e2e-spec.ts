@@ -9,7 +9,7 @@ const testProperties = new TestProperties();
 let scoreBasePath: string;
 let defaultTestUser: User;
 beforeAll(async () => {
-  await testSetup.setup();
+  await testSetup.setup({ shouldCreateDefaults: true });
   ({ defaultTestUser } = testSetup.getServices());
   scoreBasePath = `/${defaultTestUser.id}/score`;
 });
