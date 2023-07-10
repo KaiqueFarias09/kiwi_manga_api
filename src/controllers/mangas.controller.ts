@@ -1,16 +1,8 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Query,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { QueryDto } from '../core/dtos';
 
-import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { HttpResponseStatus } from '../core/enums';
 import {
   GetMangaByIdHttpResponse,
@@ -21,7 +13,6 @@ import { MangasUseCase } from '../use-cases/mangas/mangas-use-case';
 
 @ApiTags('mangas')
 @ApiSecurity('X-API-Key')
-@UseInterceptors(CacheInterceptor)
 @Controller('mangas')
 @UseGuards(AuthGuard('api-key'))
 export class MangasController {
@@ -31,7 +22,6 @@ export class MangasController {
     status: 200,
     type: GetMangasHttpResponse,
   })
-  @CacheTTL(600)
   @Get()
   async findMany(@Query() queryDto: QueryDto): Promise<GetMangasHttpResponse> {
     if (queryDto.keywords) {
