@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Patch,
   UseGuards,
@@ -27,22 +28,22 @@ import { UsersUseCase } from '../use-cases/users';
 
 @ApiTags('users')
 @ApiSecurity('X-API-Key')
+@ApiSecurity('Authorization')
 @UseGuards(AuthGuard('api-key'), AuthGuard('jwt'))
-@Controller('users/:userId')
+@Controller('users')
 export class UsersController {
   userService: UsersUseCase;
-  constructor(userService: UsersUseCase) {
+  constructor(@Inject(UsersUseCase) userService: UsersUseCase) {
     this.userService = userService;
   }
 
-  @Get()
+  @Get('me')
   getMe(@GetUser() user: any) {
-    console.log(user);
     return user;
   }
 
   @ApiResponse({ status: 200, type: UpdatePasswordHttpResponse })
-  @Patch('password')
+  @Patch(':userId/password')
   async updatePassword(
     @Param('userId') userId: string,
     @Body() updatePasswordDto: UpdatePasswordDto,
@@ -63,7 +64,7 @@ export class UsersController {
   }
 
   @ApiResponse({ status: 200, type: UpdateNicknameHttpResponse })
-  @Patch('nickname')
+  @Patch(':userId/nickname')
   async updateNickname(
     @Param('userId') userId: string,
     @Body() updateNicknameDto: UpdateNicknameDto,
@@ -85,7 +86,7 @@ export class UsersController {
   }
 
   @ApiResponse({ status: 200, type: UpdateEmailHttpResponse })
-  @Patch('email')
+  @Patch(':userId/email')
   async updateEmail(
     @Param('userId') userId: string,
     @Body() updateEmailDto: UpdateEmailDto,
@@ -106,7 +107,7 @@ export class UsersController {
   }
 
   @ApiResponse({ status: 200, type: DeleteAccountHttpResponse })
-  @Delete()
+  @Delete(':userId')
   async deleteAccount(
     @Param('userId') userId: string,
     @Body() deleteAccountDto: DeleteAccountDto,
