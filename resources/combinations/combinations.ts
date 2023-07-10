@@ -1,0 +1,347 @@
+import { Combination } from '../../src/core/entities';
+
+export default class CombinationList {
+  static combinations: Combination[] = [
+    {
+      id: '53558',
+      name: {
+        english: 'Magical Adventure',
+        portuguese: 'Aventura Mágica',
+        german: 'Magisches Abenteuer',
+        french: 'Aventure Magique',
+        spanish: 'Aventura Mágica',
+      },
+      genres: [5, 35, 58],
+    },
+    {
+      id: '284647',
+      name: {
+        english: 'Historical Drama',
+        portuguese: 'Drama Histórico',
+        german: 'Historisches Drama',
+        french: 'Drame Historique',
+        spanish: 'Drama Histórico',
+      },
+      genres: [28, 46, 47],
+    },
+    {
+      id: '72110',
+      name: {
+        english: 'Mystery Thriller',
+        portuguese: 'Suspense de Mistério',
+        german: 'Mystery-Thriller',
+        french: 'Thriller Mystère',
+        spanish: 'Thriller de Misterio',
+      },
+      genres: [72, 110],
+    },
+    {
+      id: '3687',
+      name: {
+        english: 'Fantasy Romance',
+        portuguese: 'Romance de Fantasia',
+        german: 'Fantasy-Romance',
+        french: 'Romance Fantastique',
+        spanish: 'Romance de Fantasía',
+      },
+      genres: [36, 87],
+    },
+    {
+      id: '1516',
+      name: {
+        english: 'Comedy of Errors',
+        portuguese: 'Comédia de Erros',
+        german: 'Komödie der Irrungen',
+        french: "Comédie d'Erreurs",
+        spanish: 'Comedia de Errores',
+      },
+      genres: [15, 16],
+    },
+    {
+      id: '4891',
+      name: {
+        english: 'Sci-fi Horror',
+        portuguese: 'Terror de Ficção Científica',
+        german: 'Sci-Fi Horror',
+        french: 'Horreur de Science-Fiction',
+        spanish: 'Terror de Ciencia Ficción',
+      },
+      genres: [48, 91],
+    },
+    {
+      id: '351012',
+      name: {
+        english: 'Action Adventure',
+        portuguese: 'Aventura de Ação',
+        german: 'Action-Abenteuer',
+        french: "Aventure d'Action",
+        spanish: 'Aventura de Acción',
+      },
+      genres: [3, 5, 10, 12],
+    },
+    {
+      id: '84110',
+      name: {
+        english: 'Psychological Thriller',
+        portuguese: 'Suspense Psicológico',
+        german: 'Psychologischer Thriller',
+        french: 'Thriller Psychologique',
+        spanish: 'Thriller Psicológico',
+      },
+      genres: [84, 110],
+    },
+    {
+      id: '364647',
+      name: {
+        english: 'Historical Fantasy',
+        portuguese: 'Fantasia Histórica',
+        german: 'Historische Fantasie',
+        french: 'Fantaisie Historique',
+        spanish: 'Fantasía Histórica',
+      },
+      genres: [36, 46, 47],
+    },
+    {
+      id: '72106102',
+      name: {
+        english: 'Supernatural Mystery',
+        portuguese: 'Mistério Sobrenatural',
+        german: 'Übernatürliches Geheimnis',
+        french: 'Mystère Surnaturel',
+        spanish: 'Misterio Sobrenatural',
+      },
+      genres: [72, 106, 102],
+    },
+    {
+      id: '2846',
+      name: {
+        english: 'Historical Drama',
+        portuguese: 'Drama Histórico',
+        german: 'Historisches Drama',
+        french: 'Drame Historique',
+        spanish: 'Drama Histórico',
+      },
+      genres: [28, 46],
+    },
+    {
+      id: '72110',
+      name: {
+        english: 'Mystery Thriller',
+        portuguese: 'Suspense de Mistério',
+        german: 'Mystery-Thriller',
+        french: 'Thriller Mystère',
+        spanish: 'Thriller de Misterio',
+      },
+      genres: [72, 110],
+    },
+    {
+      id: '531',
+      name: {
+        english: 'Space Adventure',
+        portuguese: 'Aventura Espacial',
+        german: 'Weltraumabenteuer',
+        french: 'Aventure Spatiale',
+        spanish: 'Aventura Espacial',
+      },
+      genres: [5, 31],
+    },
+    {
+      id: '3558',
+      name: {
+        english: 'Magic Fantasy',
+        portuguese: 'Fantasia Mágica',
+        german: 'Magische Fantasie',
+        french: 'Fantaisie Magique',
+        spanish: 'Fantasía Mágica',
+      },
+      genres: [35, 58],
+    },
+    {
+      id: '1590',
+      name: {
+        english: 'School Comedy',
+        portuguese: 'Comédia Escolar',
+        german: 'Schulkomödie',
+        french: 'Comédie Scolaire',
+        spanish: 'Comedia Escolar',
+      },
+      genres: [15, 90],
+    },
+    {
+      id: '48106',
+      name: {
+        english: 'Supernatural Horror',
+        portuguese: 'Horror Sobrenatural',
+        german: 'Übernatürlicher Horror',
+        french: 'Horreur Surnaturelle',
+        spanish: 'Horror Sobrenatural',
+      },
+      genres: [48, 106],
+    },
+    {
+      id: '2884',
+      name: {
+        english: 'Psychological Drama',
+        portuguese: 'Drama Psicológico',
+        german: 'Psychologisches Drama',
+        french: 'Drame Psychologique',
+        spanish: 'Drama Psicológico',
+      },
+      genres: [28, 84],
+    },
+    {
+      id: '1587',
+      name: {
+        english: 'Romantic Comedy',
+        portuguese: 'Comédia Romântica',
+        german: 'Romantische Komödie',
+        french: 'Comédie Romantique',
+        spanish: 'Comedia Romántica',
+      },
+      genres: [15, 87],
+    },
+    {
+      id: '35',
+      name: {
+        english: 'Action Adventure',
+        portuguese: 'Aventura de Ação',
+        german: 'Action-Abenteuer',
+        french: "Aventure d'Action",
+        spanish: 'Aventura de Acción',
+      },
+      genres: [3, 5],
+    },
+    {
+      id: '91110',
+      name: {
+        english: 'Sci-fi Thriller',
+        portuguese: 'Suspense de Ficção Científica',
+        german: 'Sci-Fi-Thriller',
+        french: 'Thriller de Science-Fiction',
+        spanish: 'Thriller de Ciencia Ficción',
+      },
+      genres: [91, 110],
+    },
+    {
+      id: '28103',
+      name: {
+        english: 'Sports Drama',
+        portuguese: 'Drama Esportivo',
+        german: 'Sportdrama',
+        french: 'Drame Sportif',
+        spanish: 'Drama Deportivo',
+      },
+      genres: [28, 103],
+    },
+    {
+      id: '1972',
+      name: {
+        english: 'Crime Mystery',
+        portuguese: 'Mistério de Crime',
+        german: 'Krimimysterium',
+        french: 'Mystère Criminel',
+        spanish: 'Misterio de Crimen',
+      },
+      genres: [19, 72],
+    },
+    {
+      id: '366',
+      name: {
+        english: 'Military Action',
+        portuguese: 'Ação Militar',
+        german: 'Militäraktion',
+        french: 'Action Militaire',
+        spanish: 'Acción Militar',
+      },
+      genres: [3, 66],
+    },
+    {
+      id: '536',
+      name: {
+        english: 'Fantasy Adventure',
+        portuguese: 'Aventura de Fantasia',
+        german: 'Fantasy-Abenteuer',
+        french: 'Aventure Fantastique',
+        spanish: 'Aventura de Fantasía',
+      },
+      genres: [5, 36],
+    },
+    {
+      id: '15100',
+      name: {
+        english: 'Slice of Life Comedy',
+        portuguese: 'Comédia do Cotidiano',
+        german: 'Slice of Life Komödie',
+        french: 'Comédie de la Vie Quotidienne',
+        spanish: 'Comedia de la Vida Cotidiana',
+      },
+      genres: [15, 100],
+    },
+    {
+      id: '8790',
+      name: {
+        english: 'School Romance',
+        portuguese: 'Romance Escolar',
+        german: 'Schulromanze',
+        french: 'Romance Scolaire',
+        spanish: 'Romance Escolar',
+      },
+      genres: [87, 90],
+    },
+    {
+      id: '4687',
+      name: {
+        english: 'Historical Romance',
+        portuguese: 'Romance Histórico',
+        german: 'Historischer Roman',
+        french: 'Romance Historique',
+        spanish: 'Romance Histórico',
+      },
+      genres: [46, 87],
+    },
+    {
+      id: '2870',
+      name: {
+        english: 'Music Drama',
+        portuguese: 'Drama Musical',
+        german: 'Musikdrama',
+        french: 'Drame Musical',
+        spanish: 'Drama Musical',
+      },
+      genres: [28, 70],
+    },
+    {
+      id: '591',
+      name: {
+        english: 'Sci-fi Adventure',
+        portuguese: 'Aventura de Ficção Científica',
+        german: 'Sci-Fi-Abenteuer',
+        french: 'Aventure de Science-Fiction',
+        spanish: 'Aventura de Ciencia Ficción',
+      },
+      genres: [5, 91],
+    },
+    {
+      id: '591',
+      name: {
+        english: 'Sci-fi Adventure',
+        portuguese: 'Aventura de Ficção Científica',
+        german: 'Sci-Fi-Abenteuer',
+        french: 'Aventure de Science-Fiction',
+        spanish: 'Aventura de Ciencia Ficción',
+      },
+      genres: [5, 91],
+    },
+    {
+      id: '28105',
+      name: {
+        english: 'Political Drama',
+        portuguese: 'Drama Político',
+        german: 'Politisches Drama',
+        french: 'Drame Politique',
+        spanish: 'Drama Político',
+      },
+      genres: [28, 105],
+    },
+  ];
+}
