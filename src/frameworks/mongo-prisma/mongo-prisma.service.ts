@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Manga, Prisma, PrismaClient } from 'prisma/prisma/mongo-client';
 import { Chapter, MangaEntity, MangaSimplified } from '../../core/entities';
-import {
-  Manga,
-  Prisma,
-  PrismaClient,
-} from '../../../prisma/prisma/mongo-client';
 
 @Injectable()
 export class MongoService extends PrismaClient {
@@ -60,13 +56,29 @@ export class MongoService extends PrismaClient {
   async multiFieldMangaSearch(
     prismaSearchTerms: Prisma.MangaWhereInput[],
     searchTerms: string[],
-  ): Promise<Manga[]> {
-    return await this.manga.findMany({
-      where: {
-        hasCover: true,
-        OR: [...prismaSearchTerms, { genres: { hasSome: searchTerms } }],
-      },
-    });
+    pageNumber = 1,
+  ): Promise<{ mangas: Manga[]; numberOfPages: number }> {
+    const [numberOfPages, mangas] = await Promise.all([
+      this.manga.count({
+        where: {
+          hasCover: true,
+          OR: [...prismaSearchTerms, { genres: { hasSome: searchTerms } }],
+        },
+      }),
+      this.manga.findMany({
+        where: {
+          hasCover: true,
+          OR: [...prismaSearchTerms, { genres: { hasSome: searchTerms } }],
+        },
+        skip: 20 * pageNumber,
+        take: 20,
+      }),
+    ]);
+
+    return {
+      mangas,
+      numberOfPages: Math.ceil(numberOfPages / 20),
+    };
   }
 
   async oneKeywordSearch(searchTerm: string): Promise<MangaSimplified[]> {

@@ -24,8 +24,8 @@ export class MangasController {
   })
   @Get()
   async findMany(@Query() queryDto: QueryDto): Promise<GetMangasHttpResponse> {
-    if (queryDto.keywords) {
-      const data = await this.mangasService.getMangas(queryDto.keywords);
+    if (queryDto.keyword) {
+      const data = await this.mangasService.getMangasBySearch(queryDto.keyword);
       return {
         status: HttpResponseStatus.SUCCESS,
         data: {
@@ -65,5 +65,10 @@ export class MangasController {
         manga: data,
       },
     };
+  }
+
+  @Get('/combinations')
+  async getCombinations() {
+    return this.mangasService.getCombinations();
   }
 }
