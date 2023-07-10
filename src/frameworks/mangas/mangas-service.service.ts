@@ -51,13 +51,30 @@ export class MangasServicesService implements IMangasRepository {
   }
 
   async getRandomManga(): Promise<MangaEntity> {
-    const validMangas = await this.mongo.manga.findMany({
-      where: { hasCover: true, chapters: { some: {} } },
-      include: { chapters: true },
+    const count = await this.mongo.manga.count();
+    const skip = Math.floor(Math.random() * count);
+
+    const randomManga = await this.mongo.manga.findFirst({
+      skip,
+      where: { hasCover: true },
+      include: {
+        chapters: true,
+      },
     });
 
-    const randomMangaIndex = Math.floor(Math.random() * validMangas.length);
-    return validMangas[randomMangaIndex];
+    let missingChapters: Chapter[];
+    if (randomManga.chapters.length === 0) {
+      missingChapters = await this.addMissingChaptersToManga({
+        mangaId: randomManga.id,
+        mangaUrl: randomManga.url,
+      });
+      return {
+        ...randomManga,
+        chapters: [...missingChapters],
+      };
+    }
+
+    return randomManga;
   }
 
   async getManga(mangaId: string): Promise<MangaEntity> {
