@@ -8,7 +8,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import { SigninDto, SignupDto } from '../core/dtos';
 import { HttpResponseStatus } from '../core/enums';
 import { SigninHttpResponse, SignupHttpResponse } from '../core/responses';
@@ -26,6 +31,7 @@ export class AuthController {
     this.authService = authServiceUseCases;
   }
 
+  @ApiOperation({ summary: 'Sign up a new user' })
   @ApiResponse({
     status: 201,
     type: SignupHttpResponse,
@@ -41,6 +47,7 @@ export class AuthController {
     };
   }
 
+  @ApiOperation({ summary: 'Sign in an existing user' })
   @ApiResponse({ status: 200, type: SigninHttpResponse })
   @HttpCode(HttpStatus.OK)
   @Post('signin')

@@ -4,13 +4,17 @@ import {
   Delete,
   Get,
   Inject,
-  Param,
   Post,
   Put,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import {
   AddMangaCollectionDto,
   CollectionDto,
@@ -28,12 +32,14 @@ import {
   UpdateCollectionHttpResponse,
 } from '../core/responses';
 import { CollectionsUseCase } from '../use-cases';
+import { User } from '../../prisma/prisma/postgres-client';
+import { GetUser } from '../decorators';
 
 @ApiTags('collections')
 @ApiSecurity('Authorization')
 @ApiSecurity('X-API-Key')
 @UseGuards(AuthGuard('api-key'), AuthGuard('jwt'))
-@Controller(':userId/collections')
+@Controller('collections')
 export class CollectionsController {
   collectionsService: CollectionsUseCase;
   constructor(
@@ -42,12 +48,13 @@ export class CollectionsController {
     this.collectionsService = collectionUseCaseService;
   }
 
+  @ApiOperation({ summary: 'Get all collections for the user' })
   @ApiResponse({ status: 200, type: GetCollectionsHttpResponse })
   @Get()
   async findCollections(
-    @Param('userId') userId: string,
+    @GetUser() user: User,
   ): Promise<GetCollectionsHttpResponse> {
-    const data = await this.collectionsService.findCollections(userId);
+    const data = await this.collectionsService.findCollections(user.id);
     return {
       status: HttpResponseStatus.SUCCESS,
       data: {
@@ -56,14 +63,15 @@ export class CollectionsController {
     };
   }
 
+  @ApiOperation({ summary: 'Create a new collection' })
   @ApiResponse({ status: 200, type: CreateCollectionHttpResponse })
   @Post()
   async createCollection(
-    @Param('userId') userId: string,
+    @GetUser() user: User,
     @Body() collectionDto: CollectionDto,
   ): Promise<CreateCollectionHttpResponse> {
     const data = await this.collectionsService.createCollection(
-      userId,
+      user.id,
       collectionDto,
     );
 
@@ -72,7 +80,7 @@ export class CollectionsController {
       data: { collection: data },
     };
   }
-
+  @ApiOperation({ summary: 'Delete a collection' })
   @ApiResponse({ status: 200, type: DeleteCollectionHttpResponse })
   @Delete()
   async deleteCollection(
@@ -84,7 +92,7 @@ export class CollectionsController {
       message: 'Collection deleted successfully',
     };
   }
-
+  @ApiOperation({ summary: 'Update a collection' })
   @ApiResponse({ status: 200, type: UpdateCollectionHttpResponse })
   @Put()
   async updateCollection(
@@ -96,7 +104,7 @@ export class CollectionsController {
       data: { collection: data },
     };
   }
-
+  @ApiOperation({ summary: 'Get all mangas from a collection' })
   @ApiResponse({ status: 200, type: GetMangasFromCollectionHttpResponse })
   @Get('mangas')
   async findCollectionMangas(
@@ -112,7 +120,7 @@ export class CollectionsController {
       },
     };
   }
-
+  @ApiOperation({ summary: 'Add a manga to a collection' })
   @ApiResponse({ status: 200, type: AddMangaToCollectionHttpResponse })
   @Post('mangas')
   async addMangaToCollection(
@@ -139,7 +147,7 @@ export class CollectionsController {
       data: { manga: data.manga, collection: data.collection },
     };
   }
-
+  @ApiOperation({ summary: 'Delete a manga from a collection' })
   @ApiResponse({ status: 200, type: DeleteMangaFromCollectionHttpResponse })
   @Delete('mangas')
   async deleteMangaFromCollection(

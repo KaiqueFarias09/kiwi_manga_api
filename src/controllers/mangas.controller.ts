@@ -1,6 +1,11 @@
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import { QueryDto } from '../core/dtos';
 
 import { HttpResponseStatus } from '../core/enums';
@@ -18,6 +23,7 @@ import { MangasUseCase } from '../use-cases/mangas/mangas-use-case';
 export class MangasController {
   constructor(private mangasService: MangasUseCase) {}
 
+  @ApiOperation({ summary: 'Find mangas by keyword' })
   @ApiResponse({
     status: 200,
     type: GetMangasHttpResponse,
@@ -35,6 +41,7 @@ export class MangasController {
     }
   }
 
+  @ApiOperation({ summary: 'Find a random manga' })
   @ApiResponse({
     status: 200,
     type: GetRandomMangaHttpResponse,
@@ -49,7 +56,7 @@ export class MangasController {
       },
     };
   }
-
+  @ApiOperation({ summary: 'Find a manga by its ID' })
   @ApiResponse({
     status: 200,
     type: GetMangaByIdHttpResponse,
@@ -66,7 +73,7 @@ export class MangasController {
       },
     };
   }
-
+  @ApiOperation({ summary: 'Get combinations of mangas' })
   @Get('/combinations')
   async getCombinations() {
     return this.mangasService.getCombinations();
