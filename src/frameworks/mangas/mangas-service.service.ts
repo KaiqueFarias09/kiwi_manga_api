@@ -2,7 +2,6 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import { load } from 'cheerio';
-import CombinationList from 'resources/combinations/combinations';
 import { IMangasRepository } from '../../core/abstracts/mangas/mangas-repostitory.abstract';
 import { Chapter } from '../../core/entities/chapters';
 import {
@@ -15,6 +14,7 @@ import {
   ResourceDoesNotExistException,
   ResourceNotFoundException,
 } from '../../core/errors';
+import CombinationList from '../../resources/combinations/combinations';
 import { ImageAnalyzer } from '../../utils';
 import { MongoService } from '../mongo-prisma/mongo-prisma.service';
 import { ScraperServiceService } from '../scraper/scraper-service.service';

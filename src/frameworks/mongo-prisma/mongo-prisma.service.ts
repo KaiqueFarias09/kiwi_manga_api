@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Manga, Prisma, PrismaClient } from 'prisma/prisma/mongo-client';
+import {
+  Manga,
+  Prisma,
+  PrismaClient,
+} from '../../../prisma/prisma/mongo-client';
 import { Chapter, MangaEntity, MangaSimplified } from '../../core/entities';
 
 @Injectable()
@@ -22,7 +26,7 @@ export class MongoService extends PrismaClient {
     mangaId: string;
     chapters: Chapter[];
   }): Promise<Manga> {
-    return await this.manga.update({
+    return this.manga.update({
       data: {
         chapters: { createMany: { data: chapters } },
       },
@@ -33,7 +37,7 @@ export class MongoService extends PrismaClient {
   }
 
   async createManga(manga: MangaEntity): Promise<Manga> {
-    return await this.manga.create({
+    return this.manga.create({
       data: {
         source: 'novelcool',
         cover: manga.cover,
@@ -82,7 +86,7 @@ export class MongoService extends PrismaClient {
   }
 
   async oneKeywordSearch(searchTerm: string): Promise<MangaSimplified[]> {
-    return await this.manga.findMany({
+    return this.manga.findMany({
       where: {
         name: {
           contains: searchTerm,
