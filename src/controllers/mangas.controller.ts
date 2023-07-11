@@ -14,7 +14,7 @@ import {
   GetMangasHttpResponse,
   GetRandomMangaHttpResponse,
 } from '../core/responses';
-import { MangasUseCase } from '../use-cases/mangas/mangas-use-case';
+import { MangasUseCase } from '../use-cases';
 
 @ApiTags('mangas')
 @ApiSecurity('X-API-Key')

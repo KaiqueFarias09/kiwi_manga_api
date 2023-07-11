@@ -14,7 +14,7 @@ import {
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
-import { GetUser } from '../decorators';
+import { User } from '../../prisma/prisma/postgres-client';
 import {
   DeleteAccountDto,
   UpdateEmailDto,
@@ -28,8 +28,8 @@ import {
   UpdateNicknameHttpResponse,
   UpdatePasswordHttpResponse,
 } from '../core/responses';
+import { GetUser } from '../decorators';
 import { UsersUseCase } from '../use-cases/users';
-import { User } from '../../prisma/prisma/postgres-client';
 
 @ApiTags('user')
 @ApiSecurity('X-API-Key')
@@ -112,7 +112,7 @@ export class UsersController {
   }
   @ApiOperation({ summary: "Delete the current authenticated user's account" })
   @ApiResponse({ status: 200, type: DeleteAccountHttpResponse })
-  @Delete('userId')
+  @Delete()
   async deleteAccount(
     @GetUser() user: User,
     @Body() deleteAccountDto: DeleteAccountDto,

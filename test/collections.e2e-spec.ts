@@ -23,7 +23,7 @@ describe('Collections', () => {
   let collection: Collection;
 
   it('should add collection', async () => {
-    collectionsBasePath = `/${defaultTestUser.id}/collections`;
+    collectionsBasePath = `/collections`;
     collectionsMangasBasePath = `${collectionsBasePath}/mangas`;
 
     return pactum

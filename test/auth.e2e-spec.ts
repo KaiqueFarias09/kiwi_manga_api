@@ -1,8 +1,7 @@
 import * as pactum from 'pactum';
 import { SigninDto, SignupDto } from '../src/core/dtos';
 import { PostgresService } from '../src/frameworks/postgres-prisma/postgres-prisma.service';
-import { TestSetup } from './utils/test-organizer';
-import { TestProperties } from './utils/test-properties';
+import { TestProperties, TestSetup } from './utils';
 
 const testSetup = new TestSetup();
 const testProperties = new TestProperties();

@@ -1,5 +1,4 @@
 import * as pactum from 'pactum';
-import { User } from '../prisma/prisma/postgres-client';
 import { PostgresService } from '../src/frameworks/postgres-prisma/postgres-prisma.service';
 import { TestProperties, TestSetup } from './utils';
 
@@ -7,12 +6,11 @@ const testSetup = new TestSetup();
 const testProperties = new TestProperties();
 
 let postgresService: PostgresService;
-let defaultTestUser: User;
 let favoritesBasePath: string;
 beforeAll(async () => {
   await testSetup.setup({ shouldCreateDefaults: true });
-  ({ defaultTestUser, postgresService } = testSetup.getServices());
-  favoritesBasePath = `/${defaultTestUser.id}/favorites`;
+  ({ postgresService } = testSetup.getServices());
+  favoritesBasePath = `/favorites`;
 });
 
 afterAll(async () => {
@@ -64,9 +62,12 @@ describe('Favorites Error Handling', () => {
   it('should not delete favorite for non-existent user', () => {
     return pactum
       .spec()
-      .delete(nonExistentUserBasePath)
+      .delete(favoritesBasePath)
       .withBody(testProperties.manga)
-      .expectStatus(400);
+      .withHeaders({
+        Authorization: 'Bearer nonexistentuserToken',
+      })
+      .expectStatus(401);
   });
 
   it('should not add duplicate favorite', async () => {
