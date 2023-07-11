@@ -18,8 +18,8 @@ async function bootstrap() {
 
   const theme = new SwaggerTheme('v3');
   const config = new DocumentBuilder()
-    .setTitle('Kiwi API Documentation')
-    .setDescription(' A API that provides programmatic access to manga data')
+    .setTitle('Kiwi Manga API Documentation')
+    .setDescription('The official Kiwi Manga API documentation')
     .setVersion('1.0')
     .addApiKey({ type: 'apiKey', name: 'X-API-Key', in: 'header' }, 'X-API-Key')
     .addApiKey(
@@ -41,9 +41,7 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT || 0, () => {
     console.log(
-      `Server is listening on port ${
-        process.env.PORT || app.getHttpServer().address().port
-      }`,
+      `Server is listening on port ${app.getHttpServer().address().port}`,
     );
   });
 }
