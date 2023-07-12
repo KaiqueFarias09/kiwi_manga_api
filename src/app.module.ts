@@ -9,6 +9,7 @@ import {
   MangasController,
   ProfilePicController,
   ScoreController,
+  UsersController,
 } from './controllers';
 import {
   AuthUseCasesModule,
@@ -22,7 +23,6 @@ import {
 } from './use-cases';
 
 import { ConfigModule } from '@nestjs/config';
-import { UsersController } from './controllers/users.controller';
 import { MongoPrismaModule } from './frameworks/mongo-prisma/mongo-prisma.module';
 import { PostgresPrismaModule } from './frameworks/postgres-prisma/postgres-prisma.module';
 import { ScraperServiceModule } from './frameworks/scraper/scraper-service.module';

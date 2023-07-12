@@ -17,7 +17,9 @@ import {
 import { SigninDto, SignupDto } from '../core/dtos';
 import { HttpResponseStatus } from '../core/enums';
 import { SigninHttpResponse, SignupHttpResponse } from '../core/responses';
-import { AuthServiceUseCases } from '../use-cases/auth/auth-service-use-cases';
+import { AuthServiceUseCases } from '../use-cases';
+import { GetUser } from '../decorators';
+import { User } from '../../prisma/prisma/postgres-client';
 
 @ApiTags('auth')
 @ApiSecurity('X-API-Key')
@@ -37,12 +39,13 @@ export class AuthController {
     type: SignupHttpResponse,
   })
   @Post('signup')
-  async signup(@Body() signupDto: SignupDto): Promise<SignupHttpResponse> {
+  async signup(@Body() signupDto: SignupDto) {
     const data = await this.authService.signup(signupDto);
     return {
       status: HttpResponseStatus.SUCCESS,
       data: {
         access_token: data.accessToken,
+        refresh_token: data.refreshToken,
       },
     };
   }
@@ -51,7 +54,7 @@ export class AuthController {
   @ApiResponse({ status: 200, type: SigninHttpResponse })
   @HttpCode(HttpStatus.OK)
   @Post('signin')
-  async signin(@Body() signinDto: SigninDto): Promise<SigninHttpResponse> {
+  async signin(@Body() signinDto: SigninDto) {
     const data = await this.authService.signin(signinDto);
     return {
       status: HttpResponseStatus.SUCCESS,
@@ -59,5 +62,20 @@ export class AuthController {
         accessToken: data.accessToken,
       },
     };
+  }
+
+  @Post('logout')
+  async logout(@GetUser() user: User) {
+    return await this.authService.logout(user.id);
+  }
+
+  @UseGuards(AuthGuard('jwt-refresh'))
+  @Post('refresh')
+  async refresh(@GetUser() data: any) {
+    console.log(data);
+    return await this.authService.refreshTokens(
+      data.payload.sub,
+      data.refreshToken,
+    );
   }
 }

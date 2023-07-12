@@ -1,17 +1,17 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
 import { IAuthService } from '../../core/abstracts/';
-import { SignTokenDto, SigninDto, SignupDto } from '../../core/dtos';
-import { AccessTokenEntity } from '../../core/entities';
+import { SigninDto, SignupDto } from '../../core/dtos';
 import { ResourceAlreadyExistException } from '../../core/errors/';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
+import { AutenticationTokens, JwtPayload } from '../../core/types';
 
 @Injectable()
 export class AuthService implements IAuthService {
   prisma: PostgresService;
-  jwt: JwtService;
+  jwtService: JwtService;
   config: ConfigService;
 
   constructor(
@@ -20,66 +20,117 @@ export class AuthService implements IAuthService {
     @Inject(ConfigService) config: ConfigService,
   ) {
     this.prisma = prisma;
-    this.jwt = jwt;
+    this.jwtService = jwt;
     this.config = config;
   }
 
-  async signup(signupDto: SignupDto): Promise<AccessTokenEntity> {
+  async signup(signupDto: SignupDto): Promise<AutenticationTokens> {
     const hash = await argon.hash(signupDto.password);
-    try {
-      const user = await this.prisma.user.create({
+    const user = await this.prisma.user
+      .create({
         data: {
           nickname: signupDto.nickname,
           email: signupDto.email,
           password: hash,
         },
+      })
+      .catch((error) => {
+        if (error.code === 'P2002') {
+          throw new ResourceAlreadyExistException();
+        }
+        throw error;
       });
-      return this.signToken({ userId: user.id, userEmail: user.email });
-    } catch (error) {
-      if (error.code === 'P2002') {
-        throw new ResourceAlreadyExistException();
-      }
-      throw error;
-    }
+
+    const tokens = await this.getTokens({ sub: user.id, email: user.email });
+    await this.updateRtHash(user.id, tokens.refreshToken);
+
+    return tokens;
   }
 
-  async signin(signinDto: SigninDto): Promise<AccessTokenEntity> {
+  async signin(signinDto: SigninDto): Promise<AutenticationTokens> {
     const user = await this.prisma.user.findUnique({
       where: {
         email: signinDto.email,
       },
     });
 
-    if (!user) throw new UnauthorizedException('Credentials incorrect');
-    const pwMatches = await argon.verify(user.password, signinDto.password);
-    if (!pwMatches) throw new UnauthorizedException('Credentials incorrect');
+    if (!user) throw new ForbiddenException('Access Denied');
 
-    const accessToken = await this.signToken({
-      userId: user.id,
-      userEmail: user.email,
+    const passwordMatches = await argon.verify(
+      user.password,
+      signinDto.password,
+    );
+    if (!passwordMatches) throw new ForbiddenException('Access Denied');
+
+    const tokens = await this.getTokens({ sub: user.id, email: user.email });
+    await this.updateRtHash(user.id, tokens.refreshToken);
+
+    return tokens;
+  }
+
+  async refreshTokens(
+    userId: string,
+    refreshToken: string,
+  ): Promise<AutenticationTokens> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
     });
+    if (!user?.hashedRefreshToken)
+      throw new ForbiddenException('Access Denied');
+
+    const rtMatches = await argon.verify(user.hashedRefreshToken, refreshToken);
+    if (!rtMatches) throw new ForbiddenException('Access Denied');
+
+    const tokens = await this.getTokens({ sub: user.id, email: user.email });
+    await this.updateRtHash(user.id, tokens.refreshToken);
+
+    return tokens;
+  }
+
+  async logout(userId: string): Promise<boolean> {
+    await this.prisma.user.updateMany({
+      where: {
+        id: userId,
+        hashedRefreshToken: {
+          not: null,
+        },
+      },
+      data: {
+        hashedRefreshToken: null,
+      },
+    });
+    return true;
+  }
+
+  private async getTokens(payload: JwtPayload): Promise<AutenticationTokens> {
+    const [at, rt] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        secret: this.config.get<string>('ACESS_TOKEN_SECRET'),
+        expiresIn: '15m',
+      }),
+      this.jwtService.signAsync(payload, {
+        secret: this.config.get<string>('REFRESH_TOKEN_SECRET'),
+        expiresIn: '7d',
+      }),
+    ]);
+
     return {
-      accessToken: accessToken.accessToken,
+      accessToken: at,
+      refreshToken: rt,
     };
   }
 
-  async signToken({
-    userId: userId,
-    userEmail: email,
-  }: SignTokenDto): Promise<{ accessToken: string }> {
-    const payload = {
-      sub: userId,
-      email,
-    };
-    const secret = this.config.get('JWT_SECRET');
-
-    const token = await this.jwt.signAsync(payload, {
-      expiresIn: '36500d',
-      secret: secret,
+  private async updateRtHash(userId: string, rt: string): Promise<void> {
+    const hash = await argon.hash(rt);
+    await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        hashedRefreshToken: hash,
+      },
     });
-
-    return {
-      accessToken: token,
-    };
   }
 }
