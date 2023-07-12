@@ -14,12 +14,12 @@ import {
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
+import { User } from '../../prisma/prisma/postgres-client';
 import { SigninDto, SignupDto } from '../core/dtos';
 import { HttpResponseStatus } from '../core/enums';
 import { SigninHttpResponse, SignupHttpResponse } from '../core/responses';
-import { AuthServiceUseCases } from '../use-cases';
 import { GetUser } from '../decorators';
-import { User } from '../../prisma/prisma/postgres-client';
+import { AuthServiceUseCases } from '../use-cases';
 
 @ApiTags('auth')
 @ApiSecurity('X-API-Key')
@@ -60,6 +60,7 @@ export class AuthController {
       status: HttpResponseStatus.SUCCESS,
       data: {
         accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
       },
     };
   }
@@ -72,7 +73,6 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt-refresh'))
   @Post('refresh')
   async refresh(@GetUser() data: any) {
-    console.log(data);
     return await this.authService.refreshTokens(
       data.payload.sub,
       data.refreshToken,

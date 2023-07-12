@@ -22,7 +22,9 @@ import {
   ScoreUseCaseModule,
 } from './use-cases';
 
+import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule } from '@nestjs/config';
+import * as redisStore from 'cache-manager-ioredis';
 import { MongoPrismaModule } from './frameworks/mongo-prisma/mongo-prisma.module';
 import { PostgresPrismaModule } from './frameworks/postgres-prisma/postgres-prisma.module';
 import { ScraperServiceModule } from './frameworks/scraper/scraper-service.module';
@@ -44,6 +46,14 @@ import { UsersUseCaseModule } from './use-cases/users';
   ],
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    CacheModule.register({
+      store: redisStore,
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
+      password: process.env.REDIS_PASSWORD,
+      ttl: 60 * 60 * 24,
+      isGlobal: true,
+    }),
     HealthUseCaseModule,
     ChapterUseCaseModule,
     MangasUseCaseModule,

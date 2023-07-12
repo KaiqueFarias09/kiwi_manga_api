@@ -31,7 +31,7 @@ export class MangasSearchService {
   async multiFieldSearch(
     keywords: string[],
     pageNumber = 1,
-  ): Promise<{ mangas: MangaSimplified[]; numberOfPages }> {
+  ): Promise<{ mangas: MangaSimplified[]; cursor?: string }> {
     const genresInKeywords = [];
     const keywordsCopy = [...keywords];
 
@@ -45,25 +45,23 @@ export class MangasSearchService {
     }
 
     if (keywordsCopy.length === 0) {
-      const { mangas, numberOfPages } = await this.mongo.multiFieldMangaSearch(
+      const { mangas, cursor } = await this.mongo.multiFieldMangaSearch(
         this.createMultiFieldSearchQuery(genresInKeywords),
         genresInKeywords,
-        pageNumber,
       );
 
       return {
         mangas,
-        numberOfPages,
+        cursor,
       };
     }
 
     const searchTerms = [...keywordsCopy, ...genresInKeywords];
-    const { mangas, numberOfPages } = await this.mongo.multiFieldMangaSearch(
+    const { mangas, cursor } = await this.mongo.multiFieldMangaSearch(
       this.createMultiFieldSearchQuery(searchTerms),
       searchTerms,
-      pageNumber,
     );
-    return { mangas, numberOfPages };
+    return { mangas, cursor };
   }
 
   private createMultiFieldSearchQuery(

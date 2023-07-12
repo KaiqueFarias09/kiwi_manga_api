@@ -56,33 +56,25 @@ export class MongoService extends PrismaClient {
       },
     });
   }
-
   async multiFieldMangaSearch(
     prismaSearchTerms: Prisma.MangaWhereInput[],
     searchTerms: string[],
-    pageNumber = 1,
-  ): Promise<{ mangas: Manga[]; numberOfPages: number }> {
-    const [numberOfPages, mangas] = await Promise.all([
-      this.manga.count({
-        where: {
-          hasCover: true,
-          OR: [...prismaSearchTerms, { genres: { hasSome: searchTerms } }],
-        },
-      }),
-      this.manga.findMany({
-        where: {
-          hasCover: true,
-          OR: [...prismaSearchTerms, { genres: { hasSome: searchTerms } }],
-        },
-        skip: 20 * pageNumber,
-        take: 20,
-      }),
-    ]);
+    cursor?: string,
+  ): Promise<{ mangas: Manga[]; cursor: string | null }> {
+    const mangas = await this.manga.findMany({
+      where: {
+        hasCover: true,
+        OR: [...prismaSearchTerms, { genres: { hasSome: searchTerms } }],
+        id: cursor ? { lt: cursor } : undefined,
+      },
+      orderBy: { id: 'desc' },
+      take: 20,
+    });
 
-    return {
-      mangas,
-      numberOfPages: Math.ceil(numberOfPages / 20),
-    };
+    // The new cursor will be the ID of the last manga in the list.
+    const newCursor = mangas.length > 0 ? mangas[mangas.length - 1].id : null;
+
+    return { mangas, cursor: newCursor };
   }
 
   async oneKeywordSearch(searchTerm: string): Promise<MangaSimplified[]> {

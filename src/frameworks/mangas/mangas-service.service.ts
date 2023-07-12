@@ -1,12 +1,14 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
+import { Cache } from 'cache-manager';
 import { load } from 'cheerio';
+import CombinationList from '../../common/data/combinations/combinations';
 import { IMangasRepository } from '../../core/abstracts/mangas/mangas-repostitory.abstract';
 import { Chapter } from '../../core/entities/chapters';
 import {
   Combination,
-  CombinationBaseInfo,
   MangaEntity,
   MangaSimplified,
 } from '../../core/entities/mangas';
@@ -14,8 +16,6 @@ import {
   ResourceDoesNotExistException,
   ResourceNotFoundException,
 } from '../../core/errors';
-import CombinationList from '../../common/data/combinations/combinations';
-import { ImageAnalyzer } from '../../utils';
 import { MongoService } from '../mongo-prisma/mongo-prisma.service';
 import { ScraperServiceService } from '../scraper/scraper-service.service';
 import { MangasSearchService } from './mangas-search-service.service';
@@ -25,88 +25,107 @@ axiosRetry(axios, { retries: 3 });
 export class MangasServicesService implements IMangasRepository {
   constructor(
     @Inject(MongoService) private mongo: MongoService,
-    @Inject(ImageAnalyzer) private imageComparer: ImageAnalyzer,
     @Inject(MangasSearchService)
     private mangasSearchService: MangasSearchService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @Inject(ScraperServiceService) private scraper: ScraperServiceService,
   ) {}
+  async getOneMorePageFromCombination({
+    currentPage,
+    finalPage,
+    combinationId,
+  }: {
+    currentPage: number;
+    finalPage: number;
+    combinationId: string;
+  }): Promise<MangaSimplified[]> {
+    const combinationInfo = CombinationList.combinations.find(
+      (comb) => comb.id === combinationId,
+    );
 
+    const additionalPage = currentPage + 1;
+    if (additionalPage === finalPage || additionalPage > finalPage) {
+      throw new BadRequestException('No more pages');
+    }
+
+    const genresStringified = combinationInfo.genres.map((genre) =>
+      genre.toString(),
+    );
+    const { mangas } = await this.mangasSearchService.multiFieldSearch(
+      [...genresStringified],
+      additionalPage,
+    );
+    return mangas;
+  }
   async getCombinations(
-    existingCombinations?: CombinationBaseInfo[],
+    existingCombinationsIds?: string[],
   ): Promise<Combination[]> {
-    if (existingCombinations) {
-      const newCombinations = CombinationList.combinations.filter(
+    if (existingCombinationsIds) {
+      const uniqueCombinations = CombinationList.combinations.filter(
         (combination) =>
-          !existingCombinations.some(
-            (baseInfo) => baseInfo.id === combination.id,
+          !existingCombinationsIds.some(
+            (baseInfo) => baseInfo === combination.id,
           ),
       );
 
-      const searchResults: Promise<Combination>[] = newCombinations.map(
-        async (combination) => {
-          const searchResult = await this.mangasSearchService.multiFieldSearch([
-            combination.genres[0].toString(),
-            combination.genres[1].toString(),
-          ]);
-
-          return {
-            ...combination,
-            currentPage: 1,
-            finalPage: searchResult.numberOfPages,
-            mangas: searchResult.mangas,
-          };
-        },
-      );
-      return await Promise.all(searchResults);
+      return await this.createCombinations(uniqueCombinations);
     }
 
     const randomCombinations = this.getRandomCombinations(
       CombinationList.combinations,
     );
-    const combinations: Promise<Combination>[] = randomCombinations.map(
-      async (combination) => {
-        const searchResult = await this.mangasSearchService.multiFieldSearch([
-          combination.genres[0].toString(),
-          combination.genres[1].toString(),
-        ]);
+    return await this.createCombinations(randomCombinations);
+  }
 
-        return {
-          ...combination,
-          currentPage: 1,
-          finalPage: searchResult.numberOfPages,
-          mangas: searchResult.mangas,
-        };
-      },
-    );
-    return await Promise.all(combinations);
+  private async createCombinations(
+    randomCombinations: Combination[],
+  ): Promise<Combination[]> {
+    const resultPromise = randomCombinations.map(async (combination) => {
+      const cachedData = await this.cacheManager.get(
+        `mangas-combination-${combination.id}`,
+      );
+      if (cachedData) return cachedData as Combination;
+
+      const stringifiedGenres = combination.genres.map((genre) =>
+        genre.toString(),
+      );
+      const searchResult = await this.mangasSearchService.multiFieldSearch([
+        ...stringifiedGenres,
+      ]);
+      const completeCombination = {
+        ...combination,
+        currentPage: 1,
+        mangas: this.shuffleArray(searchResult.mangas),
+        finalPage: searchResult.cursor,
+      };
+      await this.cacheManager.set(
+        `mangas-combination-${combination.id}`,
+        completeCombination,
+        60 * 60 * 24,
+      );
+      return completeCombination;
+    });
+
+    const result = await Promise.all(resultPromise);
+    return result;
   }
 
   private getRandomCombinations(
     combinationsList: Combination[],
     numberOfCombinations = 10,
   ): Combination[] {
-    const shuffled = [...combinationsList];
+    const shuffledCombinations = this.shuffleArray(combinationsList);
+    return shuffledCombinations.slice(0, numberOfCombinations);
+  }
+
+  private shuffleArray(array: any[]): any[] {
+    const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    return shuffled.slice(0, numberOfCombinations);
-  }
 
-  async getOneMorePageFromCombination(
-    combination: CombinationBaseInfo,
-  ): Promise<MangaSimplified[]> {
-    const additionalPage = combination.page + 1;
-
-    if (additionalPage === combination.maxPages) {
-      throw new BadRequestException('No more pages');
-    }
-
-    const { mangas } = await this.mangasSearchService.multiFieldSearch(
-      [combination.genres[0].toString(), combination.genres[1].toString()],
-      additionalPage,
-    );
-    return mangas;
+    return shuffled;
   }
 
   async getMangasBySearch(keyword: string): Promise<MangaSimplified[]> {

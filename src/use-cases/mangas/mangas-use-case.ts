@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { IMangasRepository } from '../../core/abstracts/';
 import {
   Combination,
-  CombinationBaseInfo,
   MangaEntity,
   MangaSimplified,
 } from '../../core/entities/';
@@ -10,16 +9,22 @@ import {
 @Injectable()
 export class MangasUseCase {
   constructor(private readonly mangasRepository: IMangasRepository) {}
-  getCombinations(
-    existingCombinations?: CombinationBaseInfo[],
-  ): Promise<Combination[]> {
-    return this.mangasRepository.getCombinations(existingCombinations);
+  getOneMorePageFromCombination({
+    combinationId,
+    cursor,
+  }: {
+    combinationId: string;
+    cursor?: number;
+  }): Promise<MangaSimplified[]> {
+    return this.mangasRepository.getOneMorePageFromCombination({
+      combinationId,
+      cursor,
+    });
   }
-  getOneMorePageFromCombination(
-    combination: CombinationBaseInfo,
-  ): Promise<MangaSimplified[]> {
-    return this.mangasRepository.getOneMorePageFromCombination(combination);
+  getCombinations(existingCombinationsIds?: string[]): Promise<Combination[]> {
+    return this.mangasRepository.getCombinations(existingCombinationsIds);
   }
+
   async getManga(url: string): Promise<MangaEntity> {
     return this.mangasRepository.getManga(url);
   }

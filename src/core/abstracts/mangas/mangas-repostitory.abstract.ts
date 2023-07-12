@@ -1,6 +1,5 @@
 import {
   Combination,
-  CombinationBaseInfo,
   MangaEntity,
   MangaSimplified,
 } from '../../entities/mangas';
@@ -10,9 +9,13 @@ export abstract class IMangasRepository {
   abstract getRandomManga(): Promise<MangaEntity>;
   abstract getMangasBySearch(keyword: string): Promise<MangaSimplified[]>;
   abstract getCombinations(
-    existingCombinations?: CombinationBaseInfo[],
+    existingCombinationsIds?: string[],
   ): Promise<Combination[]>;
-  abstract getOneMorePageFromCombination(
-    combination: CombinationBaseInfo,
-  ): Promise<MangaSimplified[]>;
+  abstract getOneMorePageFromCombination({
+    cursor,
+    combinationId,
+  }: {
+    cursor?: number;
+    combinationId: string;
+  }): Promise<MangaSimplified[]>;
 }
