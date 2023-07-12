@@ -128,7 +128,7 @@ describe('Auth Error Handling', () => {
         .spec()
         .post('/auth/signin')
         .withBody(incorrectPasswordSigninDto)
-        .expectStatus(401);
+        .expectStatus(403);
     });
 
     it("should not sign in with an email that doesn't exist", () => {
@@ -136,7 +136,7 @@ describe('Auth Error Handling', () => {
         .spec()
         .post('/auth/signin')
         .withBody(nonExistentUserSigninDto)
-        .expectStatus(401);
+        .expectStatus(403);
     });
   });
 });
