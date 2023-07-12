@@ -1,4 +1,4 @@
-import { Combination } from '../../core/entities';
+import { Combination } from '../../../core/entities';
 
 export default class CombinationList {
   static combinations: Combination[] = [
