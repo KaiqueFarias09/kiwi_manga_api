@@ -1,5 +1,4 @@
 import * as pactum from 'pactum';
-import { User } from '../prisma/prisma/postgres-client';
 import { IncreaseScoreDto } from '../src/core/dtos';
 import { TestProperties, TestSetup } from './utils';
 
@@ -7,11 +6,9 @@ const testSetup = new TestSetup();
 const testProperties = new TestProperties();
 
 let scoreBasePath: string;
-let defaultTestUser: User;
 beforeAll(async () => {
   await testSetup.setup({ shouldCreateDefaults: true });
-  ({ defaultTestUser } = testSetup.getServices());
-  scoreBasePath = `/${defaultTestUser.id}/score`;
+  scoreBasePath = `/score`;
 });
 
 afterAll(async () => {
@@ -20,12 +17,12 @@ afterAll(async () => {
 
 describe('Score', () => {
   it('should get score', async () => {
-    return pactum.spec().get(scoreBasePath).expectStatus(200);
+    return pactum.spec().get(`${scoreBasePath}/podium`).expectStatus(200);
   });
 
   it('should update score', () => {
     const updateScoreDto: IncreaseScoreDto = {
-      increase: testProperties.increaseScoreValue,
+      pointsToAdd: testProperties.increaseScoreValue,
     };
 
     return pactum
@@ -45,7 +42,7 @@ describe('Score Error Handling', () => {
 
   it('should not update score for non-existent user', () => {
     const updateScoreDto: IncreaseScoreDto = {
-      increase: testProperties.increaseScoreValue,
+      pointsToAdd: testProperties.increaseScoreValue,
     };
 
     return pactum
@@ -57,7 +54,7 @@ describe('Score Error Handling', () => {
 
   it('should not update score with invalid data', () => {
     const invalidUpdateScoreDto: IncreaseScoreDto = {
-      increase: -1,
+      pointsToAdd: -1,
     };
 
     return pactum

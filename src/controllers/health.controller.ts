@@ -1,6 +1,11 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import { HttpResponseStatus } from '../core/enums';
 import { GetHealthHttpResponse } from '../core/responses';
 import { HealthUseCases } from '../use-cases/health/health-use-case';
@@ -12,6 +17,7 @@ import { HealthUseCases } from '../use-cases/health/health-use-case';
 export class HealthController {
   constructor(private readonly healthUseCase: HealthUseCases) {}
 
+  @ApiOperation({ summary: 'Get health status of the application' })
   @ApiResponse({ status: 200, type: GetHealthHttpResponse })
   @Get()
   getHealth(): GetHealthHttpResponse {

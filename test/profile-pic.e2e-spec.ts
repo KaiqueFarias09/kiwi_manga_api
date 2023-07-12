@@ -1,5 +1,4 @@
 import * as pactum from 'pactum';
-import { User } from '../prisma/prisma/postgres-client';
 import { UpdateProfilePicDto } from '../src/core/dtos';
 import { TestProperties, TestSetup } from './utils';
 
@@ -7,11 +6,9 @@ const testSetup = new TestSetup();
 const testProperties = new TestProperties();
 
 let baseProfilePicPath: string;
-let defaultTestUser: User;
 beforeAll(async () => {
   await testSetup.setup({ shouldCreateDefaults: true });
-  ({ defaultTestUser } = testSetup.getServices());
-  baseProfilePicPath = `/${defaultTestUser.id}/profile-pic`;
+  baseProfilePicPath = `/profile-pic`;
 });
 
 afterAll(async () => {

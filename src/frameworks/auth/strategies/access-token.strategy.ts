@@ -2,13 +2,13 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { IJwtStrategy } from '../../../core/abstracts';
-import { PostgresService } from '../../../frameworks/postgres-prisma/postgres-prisma.service';
+import { IAccessTokenStrategy } from '../../../core/abstracts';
+import { PostgresService } from '../../postgres-prisma/postgres-prisma.service';
 
 @Injectable()
-export class JwtStrategyService
+export class AccessTokenStrategyService
   extends PassportStrategy(Strategy, 'jwt')
-  implements IJwtStrategy
+  implements IAccessTokenStrategy
 {
   postgresService: PostgresService;
   constructor(
@@ -17,7 +17,7 @@ export class JwtStrategyService
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: config.get('JWT_SECRET'),
+      secretOrKey: config.get('ACESS_TOKEN_SECRET'),
     });
     this.postgresService = postgresService;
   }

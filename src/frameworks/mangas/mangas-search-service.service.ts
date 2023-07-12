@@ -28,7 +28,10 @@ export class MangasSearchService {
     this.imageAnalyzer = imageAnalyzerService;
   }
 
-  async multiFieldSearch(keywords: string[]): Promise<MangaSimplified[]> {
+  async multiFieldSearch(
+    keywords: string[],
+    pageNumber = 1,
+  ): Promise<{ mangas: MangaSimplified[]; numberOfPages }> {
     const genresInKeywords = [];
     const keywordsCopy = [...keywords];
 
@@ -42,17 +45,25 @@ export class MangasSearchService {
     }
 
     if (keywordsCopy.length === 0) {
-      return await this.mongo.multiFieldMangaSearch(
+      const { mangas, numberOfPages } = await this.mongo.multiFieldMangaSearch(
         this.createMultiFieldSearchQuery(genresInKeywords),
         genresInKeywords,
+        pageNumber,
       );
+
+      return {
+        mangas,
+        numberOfPages,
+      };
     }
 
     const searchTerms = [...keywordsCopy, ...genresInKeywords];
-    return await this.mongo.multiFieldMangaSearch(
+    const { mangas, numberOfPages } = await this.mongo.multiFieldMangaSearch(
       this.createMultiFieldSearchQuery(searchTerms),
       searchTerms,
+      pageNumber,
     );
+    return { mangas, numberOfPages };
   }
 
   private createMultiFieldSearchQuery(

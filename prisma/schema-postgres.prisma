@@ -1,66 +1,67 @@
 generator client {
-    provider = "prisma-client-js"
-    output   = "./prisma/postgres-client"
+  provider = "prisma-client-js"
+  output   = "./prisma/postgres-client"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("POSTGRES_URL")
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
 }
 
 model User {
-    id             String          @id @default(cuid())
-    nickname       String
-    email          String          @unique
-    password       String
-    profilePicture String          @default("")
-    score          Int             @default(0)
-    createdAt      DateTime        @default(now())
-    Collection     Collection[]
-    FavoriteManga  FavoriteManga[]
+  id                 String          @id @default(cuid())
+  nickname           String
+  email              String          @unique
+  password           String
+  profilePicture     String          @default("")
+  score              Int             @default(0)
+  createdAt          DateTime        @default(now())
+  hashedRefreshToken String?
+  Collection         Collection[]
+  FavoriteManga      FavoriteManga[]
 
-    @@map("users")
+  @@map("users")
 }
 
 model Manga {
-    id          String            @id
-    cover       String
-    name        String
-    synopsis    String
-    collections MangaCollection[]
-    favorites   FavoriteManga[]
+  id          String            @id
+  cover       String
+  name        String
+  synopsis    String
+  collections MangaCollection[]
+  favorites   FavoriteManga[]
 
-    @@map("mangas")
+  @@map("mangas")
 }
 
 model Collection {
-    id          String @id @default(cuid())
-    name        String
-    description String
+  id          String @id @default(cuid())
+  name        String
+  description String
 
-    user            User              @relation(fields: [userId], references: [id])
-    userId          String
-    MangaCollection MangaCollection[]
+  user            User              @relation(fields: [userId], references: [id])
+  userId          String
+  MangaCollection MangaCollection[]
 
-    @@map("collections")
+  @@map("collections")
 }
 
 model MangaCollection {
-    mangaId      String
-    manga        Manga      @relation(fields: [mangaId], references: [id])
-    collectionId String
-    collection   Collection @relation(fields: [collectionId], references: [id])
+  mangaId      String
+  manga        Manga      @relation(fields: [mangaId], references: [id])
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id])
 
-    @@id([mangaId, collectionId])
-    @@map("manga_collection")
+  @@id([mangaId, collectionId])
+  @@map("manga_collection")
 }
 
 model FavoriteManga {
-    mangaId String
-    manga   Manga  @relation(fields: [mangaId], references: [id])
-    userId  String
-    user    User   @relation(fields: [userId], references: [id])
+  mangaId String
+  manga   Manga  @relation(fields: [mangaId], references: [id])
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
 
-    @@id([mangaId, userId])
-    @@map("favorite_manga")
+  @@id([mangaId, userId])
+  @@map("favorite_manga")
 }

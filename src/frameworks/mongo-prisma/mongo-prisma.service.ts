@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Chapter, MangaEntity, MangaSimplified } from '../../core/entities';
 import {
   Manga,
   Prisma,
   PrismaClient,
 } from '../../../prisma/prisma/mongo-client';
+import { Chapter, MangaEntity, MangaSimplified } from '../../core/entities';
 
 @Injectable()
 export class MongoService extends PrismaClient {
@@ -26,7 +26,7 @@ export class MongoService extends PrismaClient {
     mangaId: string;
     chapters: Chapter[];
   }): Promise<Manga> {
-    return await this.manga.update({
+    return this.manga.update({
       data: {
         chapters: { createMany: { data: chapters } },
       },
@@ -37,7 +37,7 @@ export class MongoService extends PrismaClient {
   }
 
   async createManga(manga: MangaEntity): Promise<Manga> {
-    return await this.manga.create({
+    return this.manga.create({
       data: {
         source: 'novelcool',
         cover: manga.cover,
@@ -60,17 +60,33 @@ export class MongoService extends PrismaClient {
   async multiFieldMangaSearch(
     prismaSearchTerms: Prisma.MangaWhereInput[],
     searchTerms: string[],
-  ): Promise<Manga[]> {
-    return await this.manga.findMany({
-      where: {
-        hasCover: true,
-        OR: [...prismaSearchTerms, { genres: { hasSome: searchTerms } }],
-      },
-    });
+    pageNumber = 1,
+  ): Promise<{ mangas: Manga[]; numberOfPages: number }> {
+    const [numberOfPages, mangas] = await Promise.all([
+      this.manga.count({
+        where: {
+          hasCover: true,
+          OR: [...prismaSearchTerms, { genres: { hasSome: searchTerms } }],
+        },
+      }),
+      this.manga.findMany({
+        where: {
+          hasCover: true,
+          OR: [...prismaSearchTerms, { genres: { hasSome: searchTerms } }],
+        },
+        skip: 20 * pageNumber,
+        take: 20,
+      }),
+    ]);
+
+    return {
+      mangas,
+      numberOfPages: Math.ceil(numberOfPages / 20),
+    };
   }
 
   async oneKeywordSearch(searchTerm: string): Promise<MangaSimplified[]> {
-    return await this.manga.findMany({
+    return this.manga.findMany({
       where: {
         name: {
           contains: searchTerm,

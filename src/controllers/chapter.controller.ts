@@ -7,7 +7,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import { HttpResponseStatus } from '../core/enums';
 import {
   GetChapterHttpResponse,
@@ -25,6 +30,7 @@ export class ChapterController {
     this.chapterService = chapterService;
   }
 
+  @ApiOperation({ summary: 'Get all chapters for a specific manga' })
   @ApiResponse({ status: 200, type: GetChaptersHttpResponse })
   @Get()
   async getChapters(
@@ -39,6 +45,7 @@ export class ChapterController {
     };
   }
 
+  @ApiOperation({ summary: 'Get a specific chapter' })
   @ApiResponse({ status: 200, type: GetChapterHttpResponse })
   @Get(':chapterId')
   async getChapter(

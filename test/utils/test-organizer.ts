@@ -47,7 +47,14 @@ export class TestSetup {
 
     if (shouldCreateDefaults) {
       const randomValue = Math.floor(Math.random() * 1000000);
-      const jwtToken = await this.getJwtToken(baseUrl, randomValue);
+      const hash = await argon.hash(
+        this.testProperties.defaultTestUser.password,
+      );
+
+      const jwtToken = await this.signupNewUser({
+        email: randomValue + this.testProperties.defaultTestUser.email,
+        hashedPassword: hash,
+      });
       this.defaultTestUser = await this.postgresService.user.findUnique({
         where: {
           email: randomValue + this.testProperties.defaultTestUser.email,
@@ -81,22 +88,55 @@ export class TestSetup {
     };
   }
 
-  private async getJwtToken(baseUrl: string, randomValue: number) {
-    const hash = await argon.hash(this.testProperties.defaultTestUser.password);
-    const response = await fetch(`${baseUrl}/auth/signup`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': this.configService.get<string>('ADMIN_TOKEN'),
+  async signupNewUser({
+    email,
+    hashedPassword,
+  }: {
+    email: string;
+    hashedPassword: string;
+  }): Promise<string> {
+    const response = await fetch(
+      `http://localhost:${this.app.getHttpServer().address().port}/auth/signup`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': this.configService.get<string>('ADMIN_TOKEN'),
+        },
+        body: JSON.stringify({
+          email: email,
+          nickname: this.testProperties.defaultTestUser.nickname,
+          password: hashedPassword,
+        }),
       },
-      body: JSON.stringify({
-        email: randomValue + this.testProperties.defaultTestUser.email,
-        nickname: this.testProperties.defaultTestUser.nickname,
-        password: hash,
-      }),
-    });
+    );
 
     const responseData = await response.json();
     return responseData.data.access_token;
+  }
+
+  async signinUser({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }): Promise<string> {
+    const response = await fetch(
+      `http://localhost:${this.app.getHttpServer().address().port}/auth/signin`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': this.configService.get<string>('ADMIN_TOKEN'),
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      },
+    );
+    const responseData = await response.json();
+    return await responseData.data.accessToken;
   }
 }

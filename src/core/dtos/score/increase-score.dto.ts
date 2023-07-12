@@ -5,5 +5,5 @@ export class IncreaseScoreDto {
   @ApiProperty()
   @IsNumber()
   @IsPositive()
-  increase: number;
+  pointsToAdd: number;
 }

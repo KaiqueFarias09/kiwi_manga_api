@@ -26,13 +26,7 @@ describe('Mangas', () => {
   describe('List', () => {
     it('should get manga list with 1 keyword', () => {
       return pactum.spec().get(mangasBasePath).withQueryParams({
-        keywords: 'Berserk',
-      });
-    });
-
-    it('should get manga list with more than 1 keyword', () => {
-      return pactum.spec().get(mangasBasePath).withQueryParams({
-        keywords: 'Berserk&Vagabond',
+        keyword: 'Berserk',
       });
     });
   });
@@ -54,14 +48,8 @@ describe('Mangas', () => {
 describe('Mangas Error Handling', () => {
   const nonExistentMangaDetailsPath = `/mangas/nonexistentmanga`;
 
-  it('should not get manga list with invalid keyword', () => {
-    return pactum
-      .spec()
-      .get(mangasBasePath)
-      .withQueryParams({
-        keywords: 'invalidkeyword',
-      })
-      .expectStatus(404);
+  it('should not get manga list with empty keyword', () => {
+    return pactum.spec().get(mangasBasePath).expectStatus(400);
   });
 
   it('should not get details for non-existent manga', () => {

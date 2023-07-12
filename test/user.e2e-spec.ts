@@ -3,27 +3,23 @@ import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as argon from 'argon2';
 import * as pactum from 'pactum';
-import { User } from '../prisma/prisma/postgres-client';
-import { PostgresService } from '../src/frameworks/postgres-prisma/postgres-prisma.service';
-import { TestSetup } from './utils/test-organizer';
-import { TestProperties } from './utils/test-properties';
+import { TestProperties, TestSetup } from './utils';
 
 const testSetup = new TestSetup();
 const testProperties = new TestProperties();
 
-let defaultTestUser: User;
-let newTestUser: User;
-let newTestPassword: string;
 let newTestEmail: string;
-let usersBasePath: string;
+let newTestPassword: string;
 let app: INestApplication;
-let postgresService: PostgresService;
 let configService: ConfigService;
 let jwtToken: string;
 
 beforeAll(async () => {
   await testSetup.setup({ shouldCreateDefaults: false });
-  ({ postgresService, app, configService } = testSetup.getServices());
+  ({ app, configService } = testSetup.getServices());
+  pactum.request.setBaseUrl(
+    `http://localhost:${app.getHttpServer().address().port}/user`,
+  );
 });
 
 afterAll(async () => {
@@ -33,14 +29,12 @@ afterAll(async () => {
 describe('Users', () => {
   describe('Password', () => {
     it('should change password', async () => {
-      newTestPassword = await argon.hash(testProperties.newPassword);
       newTestEmail = `${Math.random()}${testProperties.email}`;
-      newTestUser = await postgresService.user.create({
-        data: {
-          email: newTestEmail,
-          password: newTestPassword,
-          nickname: testProperties.nickname,
-        },
+      newTestPassword = await argon.hash(testProperties.newPassword);
+
+      jwtToken = await testSetup.signupNewUser({
+        email: newTestEmail,
+        hashedPassword: newTestPassword,
       });
 
       const changePasswordDto = {
@@ -48,80 +42,60 @@ describe('Users', () => {
         newPassword: testProperties.newPassword,
       };
 
-      const response = await fetch(
-        `http://localhost:${app.getHttpServer().address().port}/auth/signin`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-API-Key': configService.get<string>('ADMIN_TOKEN'),
-          },
-          body: JSON.stringify({
-            email: newTestEmail,
-            password: testProperties.newPassword,
-          }),
-        },
-      );
-      const responseData = await response.json();
-      jwtToken = await responseData.data.accessToken;
+      pactum.request.setDefaultHeaders({
+        'X-API-Key': configService.get<string>('ADMIN_TOKEN'),
+        Authorization: `Bearer ${jwtToken}`,
+      });
 
       return pactum
         .spec()
-        .patch(
-          `http://localhost:${app.getHttpServer().address().port}/users/${
-            newTestUser.id
-          }/password`,
-        )
+        .patch(`/password`)
         .withBody(changePasswordDto)
-        .expectStatus(200)
-        .withHeaders({
-          'X-API-Key': configService.get<string>('ADMIN_TOKEN'),
-          Authorization: `Bearer ${jwtToken}`,
-        });
+        .expectStatus(200);
     });
   });
 
-  // describe('Nickname', () => {
-  //   it('should change nickname', () => {
-  //     const changeNicknameDto = {
-  //       newNickname: 'vlad',
-  //       password: testProperties.newPassword,
-  //     };
+  describe('Nickname', () => {
+    it('should change nickname', () => {
+      const changeNicknameDto = {
+        newNickname: 'vlad',
+        password: testProperties.newPassword,
+      };
 
-  //     return pactum
-  //       .spec()
-  //       .patch(`${usersBasePath}/nickname`)
-  //       .withBody(changeNicknameDto)
-  //       .expectStatus(200);
-  //   });
-  // });
+      return pactum
+        .spec()
+        .patch('/nickname')
+        .withBody(changeNicknameDto)
+        .expectStatus(200);
+    });
+  });
 
-  // describe('Email', () => {
-  //   it('should change email', () => {
-  //     const changeEmailDto = {
-  //       newEmail: `2${defaultTestUser.email}}`,
-  //       password: testProperties.newPassword,
-  //     };
+  describe('Email', () => {
+    it('should change email', () => {
+      const changeEmailDto = {
+        newEmail: `2${newTestEmail}}`,
+        password: testProperties.newPassword,
+      };
 
-  //     return pactum
-  //       .spec()
-  //       .patch(`${usersBasePath}/email`)
-  //       .withBody(changeEmailDto)
-  //       .expectStatus(200);
-  //   });
-  // });
+      return pactum
+        .spec()
+        .patch('/email')
+        .withBody(changeEmailDto)
+        .expectStatus(200);
+    });
+  });
 
-  // describe('Delete', () => {
-  //   it('should delete user', () => {
-  //     return pactum
-  //       .spec()
-  //       .delete(usersBasePath)
-  //       .withBody({
-  //         password: testProperties.newPassword,
-  //       })
-  //       .expectStatus(200);
-  //   });
-  // });
+  describe('Delete', () => {
+    it('should delete user', () => {
+      return pactum
+        .spec()
+        .delete('/')
+        .withBody({
+          password: testProperties.newPassword,
+        })
+        .expectStatus(200);
+    });
+  });
 });
 
 // describe('Users Error Handling', () => {

@@ -4,11 +4,17 @@ import axiosRetry from 'axios-retry';
 import { load } from 'cheerio';
 import { IMangasRepository } from '../../core/abstracts/mangas/mangas-repostitory.abstract';
 import { Chapter } from '../../core/entities/chapters';
-import { MangaEntity, MangaSimplified } from '../../core/entities/mangas';
+import {
+  Combination,
+  CombinationBaseInfo,
+  MangaEntity,
+  MangaSimplified,
+} from '../../core/entities/mangas';
 import {
   ResourceDoesNotExistException,
   ResourceNotFoundException,
 } from '../../core/errors';
+import CombinationList from '../../resources/combinations/combinations';
 import { ImageAnalyzer } from '../../utils';
 import { MongoService } from '../mongo-prisma/mongo-prisma.service';
 import { ScraperServiceService } from '../scraper/scraper-service.service';
@@ -17,37 +23,97 @@ import { MangasSearchService } from './mangas-search-service.service';
 axiosRetry(axios, { retries: 3 });
 @Injectable()
 export class MangasServicesService implements IMangasRepository {
-  mongo: MongoService;
-  imageComparer: ImageAnalyzer;
-  mangasSearchService: MangasSearchService;
-  scraper: ScraperServiceService;
-
   constructor(
-    @Inject(MongoService) mongoService: MongoService,
-    @Inject(ImageAnalyzer) imageComparer: ImageAnalyzer,
-    @Inject(MangasSearchService) mangasSearchService: MangasSearchService,
-    @Inject(ScraperServiceService) scraper: ScraperServiceService,
-  ) {
-    this.mongo = mongoService;
-    this.imageComparer = imageComparer;
-    this.mangasSearchService = mangasSearchService;
-    this.scraper = scraper;
+    @Inject(MongoService) private mongo: MongoService,
+    @Inject(ImageAnalyzer) private imageComparer: ImageAnalyzer,
+    @Inject(MangasSearchService)
+    private mangasSearchService: MangasSearchService,
+    @Inject(ScraperServiceService) private scraper: ScraperServiceService,
+  ) {}
+
+  async getCombinations(
+    existingCombinations?: CombinationBaseInfo[],
+  ): Promise<Combination[]> {
+    if (existingCombinations) {
+      const newCombinations = CombinationList.combinations.filter(
+        (combination) =>
+          !existingCombinations.some(
+            (baseInfo) => baseInfo.id === combination.id,
+          ),
+      );
+
+      const searchResults: Promise<Combination>[] = newCombinations.map(
+        async (combination) => {
+          const searchResult = await this.mangasSearchService.multiFieldSearch([
+            combination.genres[0].toString(),
+            combination.genres[1].toString(),
+          ]);
+
+          return {
+            ...combination,
+            currentPage: 1,
+            finalPage: searchResult.numberOfPages,
+            mangas: searchResult.mangas,
+          };
+        },
+      );
+      return await Promise.all(searchResults);
+    }
+
+    const randomCombinations = this.getRandomCombinations(
+      CombinationList.combinations,
+    );
+    const combinations: Promise<Combination>[] = randomCombinations.map(
+      async (combination) => {
+        const searchResult = await this.mangasSearchService.multiFieldSearch([
+          combination.genres[0].toString(),
+          combination.genres[1].toString(),
+        ]);
+
+        return {
+          ...combination,
+          currentPage: 1,
+          finalPage: searchResult.numberOfPages,
+          mangas: searchResult.mangas,
+        };
+      },
+    );
+    return await Promise.all(combinations);
   }
 
-  async getMangas(keywords: string[]): Promise<MangaSimplified[]> {
-    if (keywords.length === 1) {
-      const mangas = await this.mangasSearchService.oneKeywordSearch(
-        keywords[0],
-      );
-      if (mangas.length === 0) throw new ResourceNotFoundException();
-
-      return mangas;
-    } else {
-      const mangas = await this.mangasSearchService.multiFieldSearch(keywords);
-      if (mangas.length === 0) throw new ResourceNotFoundException();
-
-      return mangas;
+  private getRandomCombinations(
+    combinationsList: Combination[],
+    numberOfCombinations = 10,
+  ): Combination[] {
+    const shuffled = [...combinationsList];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
+    return shuffled.slice(0, numberOfCombinations);
+  }
+
+  async getOneMorePageFromCombination(
+    combination: CombinationBaseInfo,
+  ): Promise<MangaSimplified[]> {
+    const additionalPage = combination.page + 1;
+
+    if (additionalPage === combination.maxPages) {
+      throw new BadRequestException('No more pages');
+    }
+
+    const { mangas } = await this.mangasSearchService.multiFieldSearch(
+      [combination.genres[0].toString(), combination.genres[1].toString()],
+      additionalPage,
+    );
+    return mangas;
+  }
+
+  async getMangasBySearch(keyword: string): Promise<MangaSimplified[]> {
+    const mangas = await this.mangasSearchService.oneKeywordSearch(keyword);
+    if (mangas.length === 0) throw new ResourceNotFoundException();
+
+    return mangas;
   }
 
   async getRandomManga(): Promise<MangaEntity> {
