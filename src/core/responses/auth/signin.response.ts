@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AccessTokenEntity } from '../../entities';
+import { AuthenticationTokens } from '../../types';
 import { DefaultHttpResponse } from '../common';
 
-export class SigninHttpResponse extends DefaultHttpResponse<AccessTokenEntity> {
+export class SigninHttpResponse extends DefaultHttpResponse<AuthenticationTokens> {
   @ApiProperty({ example: 'success' })
   status: string;
 
@@ -10,11 +10,13 @@ export class SigninHttpResponse extends DefaultHttpResponse<AccessTokenEntity> {
     example: {
       accessToken:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+      refreshToken:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.qwdJ5f5F6DZXJQVtFGN7FJ7Kk9z4TOwTJaV6bOJ6abc',
     },
   })
-  data: AccessTokenEntity;
+  data: AuthenticationTokens;
 
-  constructor(status: string, data: AccessTokenEntity) {
+  constructor(status: string, data: AuthenticationTokens) {
     super(status, data);
   }
 }

@@ -1,12 +1,12 @@
 import { SigninDto, SignupDto } from '../../dtos/';
-import { AutenticationTokens } from '../../types';
+import { AuthenticationTokens } from '../../types';
 
 export abstract class IAuthService {
-  abstract signup(signupDto: SignupDto): Promise<AutenticationTokens>;
-  abstract signin(signinDto: SigninDto): Promise<AutenticationTokens>;
+  abstract signup(signupDto: SignupDto): Promise<AuthenticationTokens>;
+  abstract signin(signinDto: SigninDto): Promise<AuthenticationTokens>;
   abstract logout(userId: string): Promise<boolean>;
   abstract refreshTokens(
     userId: string,
     refreshToken: string,
-  ): Promise<AutenticationTokens>;
+  ): Promise<AuthenticationTokens>;
 }
