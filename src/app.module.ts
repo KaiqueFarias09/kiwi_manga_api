@@ -51,7 +51,7 @@ import { UsersUseCaseModule } from './use-cases/users';
       host: process.env.REDIS_HOST,
       port: process.env.REDIS_PORT,
       password: process.env.REDIS_PASSWORD,
-      ttl: 60 * 60 * 24,
+      ttl: 60 * 60 * 12,
       isGlobal: true,
     }),
     HealthUseCaseModule,
