@@ -9,18 +9,20 @@ import {
 @Injectable()
 export class MangasUseCase {
   constructor(private readonly mangasRepository: IMangasRepository) {}
+
   getOneMorePageFromCombination({
     combinationId,
-    cursor,
+    page,
   }: {
     combinationId: string;
-    cursor?: number;
+    page: number;
   }): Promise<MangaSimplified[]> {
     return this.mangasRepository.getOneMorePageFromCombination({
       combinationId,
-      cursor,
+      page,
     });
   }
+
   getCombinations(existingCombinationsIds?: string[]): Promise<Combination[]> {
     return this.mangasRepository.getCombinations(existingCombinationsIds);
   }
@@ -28,9 +30,11 @@ export class MangasUseCase {
   async getManga(url: string): Promise<MangaEntity> {
     return this.mangasRepository.getManga(url);
   }
+
   async getRandomManga(): Promise<MangaEntity> {
     return this.mangasRepository.getRandomManga();
   }
+
   getMangasBySearch(keyword: string): Promise<MangaSimplified[]> {
     return this.mangasRepository.getMangasBySearch(keyword);
   }
