@@ -15,7 +15,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Cache } from 'cache-manager';
-import { MangaEntity, MangaSimplified } from 'src/core/entities';
+import { MangaEntity, MangaSimplified } from '../core/entities';
 import {
   CombinationsQueryDto,
   GetMorePagesFromCombinationQueryDto,

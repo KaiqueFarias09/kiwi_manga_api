@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AuthenticationTokens } from 'src/core/types';
+import { AuthenticationTokens } from '../../types';
 import { DefaultHttpResponse } from '../common';
 
 export class SignupHttpResponse extends DefaultHttpResponse<AuthenticationTokens> {
