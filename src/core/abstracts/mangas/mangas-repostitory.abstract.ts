@@ -1,18 +1,21 @@
-import {
-  Combination,
-  CombinationBaseInfo,
-  MangaEntity,
-  MangaSimplified,
-} from '../../entities/mangas';
+import { Combination, MangaEntity, MangaSimplified } from '../../entities';
 
 export abstract class IMangasRepository {
   abstract getManga(url: string): Promise<MangaEntity>;
+
   abstract getRandomManga(): Promise<MangaEntity>;
+
   abstract getMangasBySearch(keyword: string): Promise<MangaSimplified[]>;
+
   abstract getCombinations(
-    existingCombinations?: CombinationBaseInfo[],
+    existingCombinationsIds?: string[],
   ): Promise<Combination[]>;
-  abstract getOneMorePageFromCombination(
-    combination: CombinationBaseInfo,
-  ): Promise<MangaSimplified[]>;
+
+  abstract getOneMorePageFromCombination({
+    page,
+    combinationId,
+  }: {
+    page: number;
+    combinationId: string;
+  }): Promise<MangaSimplified[]>;
 }

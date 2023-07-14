@@ -4,7 +4,6 @@ export class Combination {
   id: string;
   name: Languages;
   genres: number[];
-  finalPage?: number;
   currentPage?: number;
   mangas?: MangaSimplified[];
 }

@@ -14,12 +14,14 @@ import {
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
+import { User } from '../../prisma/prisma/postgres-client';
 import { SigninDto, SignupDto } from '../core/dtos';
 import { HttpResponseStatus } from '../core/enums';
 import { SigninHttpResponse, SignupHttpResponse } from '../core/responses';
-import { AuthServiceUseCases } from '../use-cases';
+import { LogoutHttpResponse } from '../core/responses/auth/logout.response';
+import { RefreshHttpResponse } from '../core/responses/auth/refresh.response';
 import { GetUser } from '../decorators';
-import { User } from '../../prisma/prisma/postgres-client';
+import { AuthServiceUseCases } from '../use-cases';
 
 @ApiTags('auth')
 @ApiSecurity('X-API-Key')
@@ -39,13 +41,13 @@ export class AuthController {
     type: SignupHttpResponse,
   })
   @Post('signup')
-  async signup(@Body() signupDto: SignupDto) {
+  async signup(@Body() signupDto: SignupDto): Promise<SignupHttpResponse> {
     const data = await this.authService.signup(signupDto);
     return {
       status: HttpResponseStatus.SUCCESS,
       data: {
-        access_token: data.accessToken,
-        refresh_token: data.refreshToken,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
       },
     };
   }
@@ -54,28 +56,50 @@ export class AuthController {
   @ApiResponse({ status: 200, type: SigninHttpResponse })
   @HttpCode(HttpStatus.OK)
   @Post('signin')
-  async signin(@Body() signinDto: SigninDto) {
+  async signin(@Body() signinDto: SigninDto): Promise<SigninHttpResponse> {
     const data = await this.authService.signin(signinDto);
     return {
       status: HttpResponseStatus.SUCCESS,
       data: {
         accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
       },
     };
   }
 
+  @UseGuards(AuthGuard('jwt'))
+  @ApiSecurity('Authorization')
+  @ApiOperation({ summary: 'Logout a user' })
+  @ApiResponse({ status: 200, type: LogoutHttpResponse })
+  @HttpCode(HttpStatus.OK)
   @Post('logout')
-  async logout(@GetUser() user: User) {
-    return await this.authService.logout(user.id);
+  async logout(@GetUser() user: User): Promise<LogoutHttpResponse> {
+    const result = await this.authService.logout(user.id);
+    if (result)
+      return {
+        status: HttpResponseStatus.SUCCESS,
+        message: 'User logged out successfully',
+      };
   }
 
+  @ApiOperation({ summary: 'Refresh access token' })
+  @ApiSecurity('Authorization')
+  @ApiResponse({ status: 200, type: RefreshHttpResponse })
+  @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard('jwt-refresh'))
   @Post('refresh')
-  async refresh(@GetUser() data: any) {
-    console.log(data);
-    return await this.authService.refreshTokens(
-      data.payload.sub,
-      data.refreshToken,
+  async refresh(@GetUser() user: User): Promise<RefreshHttpResponse> {
+    const { accessToken, refreshToken } = await this.authService.refreshTokens(
+      user.id,
+      user.hashedRefreshToken,
     );
+
+    return {
+      status: HttpResponseStatus.SUCCESS,
+      data: {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      },
+    };
   }
 }

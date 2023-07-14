@@ -6,6 +6,7 @@ import {
   PrismaClient,
 } from '../../../prisma/prisma/mongo-client';
 import { Chapter, MangaEntity, MangaSimplified } from '../../core/entities';
+import { ResourceNotFoundException } from '../../core/errors';
 
 @Injectable()
 export class MongoService extends PrismaClient {
@@ -60,29 +61,19 @@ export class MongoService extends PrismaClient {
   async multiFieldMangaSearch(
     prismaSearchTerms: Prisma.MangaWhereInput[],
     searchTerms: string[],
-    pageNumber = 1,
-  ): Promise<{ mangas: Manga[]; numberOfPages: number }> {
-    const [numberOfPages, mangas] = await Promise.all([
-      this.manga.count({
-        where: {
-          hasCover: true,
-          OR: [...prismaSearchTerms, { genres: { hasSome: searchTerms } }],
-        },
-      }),
-      this.manga.findMany({
-        where: {
-          hasCover: true,
-          OR: [...prismaSearchTerms, { genres: { hasSome: searchTerms } }],
-        },
-        skip: 20 * pageNumber,
-        take: 20,
-      }),
-    ]);
+    page: number,
+  ): Promise<Manga[]> {
+    const mangas = await this.manga.findMany({
+      where: {
+        hasCover: true,
+        OR: [...prismaSearchTerms, { genres: { hasSome: searchTerms } }],
+      },
+      take: 20,
+      skip: 20 * page,
+    });
 
-    return {
-      mangas,
-      numberOfPages: Math.ceil(numberOfPages / 20),
-    };
+    if (mangas.length === 0) throw new ResourceNotFoundException();
+    return mangas;
   }
 
   async oneKeywordSearch(searchTerm: string): Promise<MangaSimplified[]> {

@@ -1,4 +1,4 @@
-export class AutenticationTokens {
+export class AuthenticationTokens {
   accessToken: string;
   refreshToken: string;
 }

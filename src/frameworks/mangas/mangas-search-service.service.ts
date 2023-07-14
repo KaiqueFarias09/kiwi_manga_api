@@ -4,9 +4,9 @@ import { CheerioAPI, load } from 'cheerio';
 import { join } from 'path';
 import { Prisma } from 'prisma/prisma/mongo-client';
 import { MangaSimplified } from '../../core/entities';
-import { MangaEntity } from '../../core/entities/mangas';
+import { MangaEntity } from '../../core/entities';
 import { ImageAnalyzer } from '../../utils';
-import { readJsonFileAsync } from '../../utils/read-json-file';
+import { readJsonFileAsync } from '../../utils';
 import { MongoService } from '../mongo-prisma/mongo-prisma.service';
 import { ScraperServiceService } from '../scraper/scraper-service.service';
 
@@ -30,8 +30,8 @@ export class MangasSearchService {
 
   async multiFieldSearch(
     keywords: string[],
-    pageNumber = 1,
-  ): Promise<{ mangas: MangaSimplified[]; numberOfPages }> {
+    pageNumber: number,
+  ): Promise<MangaSimplified[]> {
     const genresInKeywords = [];
     const keywordsCopy = [...keywords];
 
@@ -45,25 +45,19 @@ export class MangasSearchService {
     }
 
     if (keywordsCopy.length === 0) {
-      const { mangas, numberOfPages } = await this.mongo.multiFieldMangaSearch(
+      return await this.mongo.multiFieldMangaSearch(
         this.createMultiFieldSearchQuery(genresInKeywords),
         genresInKeywords,
         pageNumber,
       );
-
-      return {
-        mangas,
-        numberOfPages,
-      };
     }
 
     const searchTerms = [...keywordsCopy, ...genresInKeywords];
-    const { mangas, numberOfPages } = await this.mongo.multiFieldMangaSearch(
+    return await this.mongo.multiFieldMangaSearch(
       this.createMultiFieldSearchQuery(searchTerms),
       searchTerms,
       pageNumber,
     );
-    return { mangas, numberOfPages };
   }
 
   private createMultiFieldSearchQuery(
@@ -148,8 +142,7 @@ export class MangasSearchService {
       const validMangas = mangas.filter((manga) => manga.chapters.length > 0);
       const promises = validMangas.map(async (manga) => {
         try {
-          const result = await this.mongo.createManga(manga);
-          return result;
+          return await this.mongo.createManga(manga);
         } catch (error) {
           console.error(error);
           return null;

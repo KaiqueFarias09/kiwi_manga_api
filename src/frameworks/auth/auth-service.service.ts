@@ -5,8 +5,8 @@ import * as argon from 'argon2';
 import { IAuthService } from '../../core/abstracts/';
 import { SigninDto, SignupDto } from '../../core/dtos';
 import { ResourceAlreadyExistException } from '../../core/errors/';
+import { AuthenticationTokens, JwtPayload } from '../../core/types';
 import { PostgresService } from '../postgres-prisma/postgres-prisma.service';
-import { AutenticationTokens, JwtPayload } from '../../core/types';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -24,7 +24,7 @@ export class AuthService implements IAuthService {
     this.config = config;
   }
 
-  async signup(signupDto: SignupDto): Promise<AutenticationTokens> {
+  async signup(signupDto: SignupDto): Promise<AuthenticationTokens> {
     const hash = await argon.hash(signupDto.password);
     const user = await this.prisma.user
       .create({
@@ -47,7 +47,7 @@ export class AuthService implements IAuthService {
     return tokens;
   }
 
-  async signin(signinDto: SigninDto): Promise<AutenticationTokens> {
+  async signin(signinDto: SigninDto): Promise<AuthenticationTokens> {
     const user = await this.prisma.user.findUnique({
       where: {
         email: signinDto.email,
@@ -71,7 +71,7 @@ export class AuthService implements IAuthService {
   async refreshTokens(
     userId: string,
     refreshToken: string,
-  ): Promise<AutenticationTokens> {
+  ): Promise<AuthenticationTokens> {
     const user = await this.prisma.user.findUnique({
       where: {
         id: userId,
@@ -104,8 +104,8 @@ export class AuthService implements IAuthService {
     return true;
   }
 
-  private async getTokens(payload: JwtPayload): Promise<AutenticationTokens> {
-    const [at, rt] = await Promise.all([
+  private async getTokens(payload: JwtPayload): Promise<AuthenticationTokens> {
+    const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: this.config.get<string>('ACESS_TOKEN_SECRET'),
         expiresIn: '15m',
@@ -117,8 +117,8 @@ export class AuthService implements IAuthService {
     ]);
 
     return {
-      accessToken: at,
-      refreshToken: rt,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
     };
   }
 
