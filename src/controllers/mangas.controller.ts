@@ -25,8 +25,10 @@ import { HttpResponseStatus } from '../core/enums';
 import {
   GetMangaByIdHttpResponse,
   GetMangasHttpResponse,
+  GetMorePagesFromCombinationsHttpResponse,
   GetRandomMangaHttpResponse,
 } from '../core/responses';
+import { GetCombinationHttpResponse } from '../core/responses/mangas/get-combination.response';
 import { MangasUseCase } from '../use-cases';
 
 @ApiTags('mangas')
@@ -40,22 +42,41 @@ export class MangasController {
   ) {}
 
   @ApiOperation({ summary: 'Get combinations of mangas' })
+  @ApiResponse({ status: 200, type: GetCombinationHttpResponse })
   @Get('/combinations')
   async getCombinations(
     @Query() { existingCombinationsIds }: CombinationsQueryDto,
-  ) {
-    return this.mangasService.getCombinations(existingCombinationsIds);
+  ): Promise<GetCombinationHttpResponse> {
+    const data = await this.mangasService.getCombinations(
+      existingCombinationsIds,
+    );
+
+    return {
+      status: HttpResponseStatus.SUCCESS,
+      data: {
+        combinations: data,
+      },
+    };
   }
 
+  @ApiOperation({ summary: 'Get more pages from a combination' })
+  @ApiResponse({ status: 200, type: GetMorePagesFromCombinationsHttpResponse })
   @Get('/combinations/:combinationId')
   async getMorePagesFromCombination(
     @Param('combinationId') combinationId: string,
-    @Query() { cursor }: GetMorePagesFromCombinationQueryDto,
-  ) {
-    return this.mangasService.getOneMorePageFromCombination({
+    @Query() { page }: GetMorePagesFromCombinationQueryDto,
+  ): Promise<GetMorePagesFromCombinationsHttpResponse> {
+    const data = await this.mangasService.getOneMorePageFromCombination({
       combinationId,
-      cursor,
+      page,
     });
+
+    return {
+      status: HttpResponseStatus.SUCCESS,
+      data: {
+        mangas: data,
+      },
+    };
   }
 
   @ApiOperation({ summary: 'Find mangas by keyword' })
@@ -105,6 +126,7 @@ export class MangasController {
       },
     };
   }
+
   @ApiOperation({ summary: 'Find a manga by its ID' })
   @ApiResponse({
     status: 200,

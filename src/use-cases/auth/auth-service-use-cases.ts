@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IAuthService } from '../../core/abstracts';
 import { SigninDto, SignupDto } from '../../core/dtos';
-import { AutenticationTokens } from '../../core/types';
+import { AuthenticationTokens } from '../../core/types';
 
 @Injectable()
 export class AuthServiceUseCases {
@@ -24,7 +24,7 @@ export class AuthServiceUseCases {
   refreshTokens(
     userId: string,
     refreshToken: string,
-  ): Promise<AutenticationTokens> {
+  ): Promise<AuthenticationTokens> {
     return this.auth.refreshTokens(userId, refreshToken);
   }
 }
