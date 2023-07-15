@@ -88,10 +88,10 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard('jwt-refresh'))
   @Post('refresh')
-  async refresh(@GetUser() user: User): Promise<RefreshHttpResponse> {
+  async refresh(@GetUser() data: any): Promise<RefreshHttpResponse> {
     const { accessToken, refreshToken } = await this.authService.refreshTokens(
-      user.id,
-      user.hashedRefreshToken,
+      data.payload.sub,
+      data.refreshToken,
     );
 
     return {
