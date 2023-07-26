@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Inject,
   Patch,
   UseGuards,
@@ -14,6 +16,7 @@ import {
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
+import * as argon from 'argon2';
 import { User } from '../../prisma/prisma/postgres-client';
 import {
   DeleteAccountDto,
@@ -29,6 +32,7 @@ import {
   UpdatePasswordHttpResponse,
 } from '../core/responses';
 import { GetUser } from '../decorators';
+import { PostgresService } from '../frameworks/postgres-prisma/postgres-prisma.service';
 import { UsersUseCase } from '../use-cases/users';
 
 @ApiTags('user')
@@ -37,15 +41,16 @@ import { UsersUseCase } from '../use-cases/users';
 @UseGuards(AuthGuard('api-key'), AuthGuard('jwt'))
 @Controller('user')
 export class UsersController {
-  userService: UsersUseCase;
-  constructor(@Inject(UsersUseCase) userService: UsersUseCase) {
-    this.userService = userService;
-  }
+  constructor(
+    @Inject(UsersUseCase) private readonly userService: UsersUseCase,
+    @Inject(PostgresService) private readonly postgresService: PostgresService,
+  ) {}
   @ApiOperation({ summary: "Get the current authenticated user's details" })
   @Get('me')
   getMe(@GetUser() user: User) {
     return user;
   }
+
   @ApiOperation({ summary: "Update the current authenticated user's password" })
   @ApiResponse({ status: 200, type: UpdatePasswordHttpResponse })
   @Patch('password')
@@ -53,6 +58,7 @@ export class UsersController {
     @GetUser() user: User,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ): Promise<UpdatePasswordHttpResponse> {
+    await this.verifyPassword(updatePasswordDto.password, user.id);
     const data = await this.userService.updatePassword({
       newPassword: updatePasswordDto.newPassword,
       userId: user.id,
@@ -74,6 +80,7 @@ export class UsersController {
     @GetUser() user: User,
     @Body() updateNicknameDto: UpdateNicknameDto,
   ): Promise<UpdateNicknameHttpResponse> {
+    await this.verifyPassword(updateNicknameDto.password, user.id);
     const data = await this.userService.updateNickname({
       newNickname: updateNicknameDto.newNickname,
       userId: user.id,
@@ -96,6 +103,7 @@ export class UsersController {
     @GetUser() user: User,
     @Body() updateEmailDto: UpdateEmailDto,
   ): Promise<UpdateEmailHttpResponse> {
+    await this.verifyPassword(updateEmailDto.password, user.id);
     const data = await this.userService.updateEmail({
       newEmail: updateEmailDto.newEmail,
       userId: user.id,
@@ -117,10 +125,25 @@ export class UsersController {
     @GetUser() user: User,
     @Body() deleteAccountDto: DeleteAccountDto,
   ): Promise<DeleteAccountHttpResponse> {
+    await this.verifyPassword(deleteAccountDto.password, user.id);
     await this.userService.deleteAccount(user.id);
     return {
       message: 'Account deleted successfully',
       status: HttpResponseStatus.SUCCESS,
     };
+  }
+
+  private async verifyPassword(password: string, userId: string) {
+    const user = await this.postgresService.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new HttpException('Invalid credentials', HttpStatus.BAD_REQUEST);
+    }
+
+    const match = await argon.verify(user.password, password);
+    if (!match) {
+      throw new HttpException('Invalid credentials', HttpStatus.BAD_REQUEST);
+    }
   }
 }

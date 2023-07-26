@@ -68,8 +68,8 @@ export class MongoService extends PrismaClient {
         hasCover: true,
         OR: [...prismaSearchTerms, { genres: { hasSome: searchTerms } }],
       },
-      take: 20,
-      skip: 20 * page,
+      take: 40,
+      skip: 40 * page,
     });
 
     if (mangas.length === 0) throw new ResourceNotFoundException();
